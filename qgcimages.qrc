@@ -196,5 +196,19 @@
         <file alias="Yield.svg">src/ui/toolbar/Images/Yield.svg</file>
         <file alias="ZoomMinus.svg">src/FlightMap/Images/ZoomMinus.svg</file>
         <file alias="ZoomPlus.svg">src/FlightMap/Images/ZoomPlus.svg</file>
+        <file alias="thermometer.svg">src/ui/toolbar/Images/thermometer.svg</file>
+        <file alias="headlightsicon.svg">src/ui/toolbar/Images/headlightsicon.svg</file>
+        <file alias="thermometer_light.svg">src/ui/toolbar/Images/thermometer_light.svg</file>
+        <file alias="pyrotLogo.png">src/ui/toolbar/Images/pyrotLogo.png</file>
+        <file alias="pitchBar.svg">src/ui/toolbar/Images/pitchBar.svg</file>
+        <file alias="pitchRedArrow.svg">src/ui/toolbar/Images/pitchRedArrow.svg</file>
+        <file alias="testRedArrow.svg">src/ui/toolbar/Images/redArrowTest.svg</file>
+        <file alias="depthBar.svg">src/ui/toolbar/Images/depthBar.svg</file>
+        <file alias="renderedSideView.png">src/ui/toolbar/Images/renderedSideView.png</file>
+        <file alias="renderedTopView.png">src/ui/toolbar/Images/renderedTopView.png</file>
+        <file alias="headingBar.svg">src/ui/toolbar/Images/headingBar.svg</file>
+        <file alias="pitchBar.png">src/ui/toolbar/Images/pitchBar.png</file>
+        <file alias="lentaCrossHair.svg">src/ui/toolbar/Images/lentaCrossHair.svg</file>
+        <file alias="message_custom.png">src/FlightMap/Images/message_custom.png</file>
     </qresource>
 </RCC>
