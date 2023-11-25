@@ -23,9 +23,21 @@ QGCComboBox {
     anchors.verticalCenter: parent.verticalCenter
     alternateText:          _activeVehicle ? _activeVehicle.flightMode : ""
     model:                  _flightModes
-    font.pointSize:         ScreenTools.mediumFontPointSize
+    font.pointSize:         ScreenTools.mediumFontPointSize * 0.65
     currentIndex:           -1
     sizeToContents:         true
+
+    background: Rectangle{
+        implicitWidth:  ScreenTools.implicitComboBoxWidth
+        implicitHeight: ScreenTools.implicitComboBoxHeight
+//        color: _qgcPal.brandingBlue
+//        color: "#000099"
+//        color: "#0066CC"
+//        color: "#000099"
+        color: "#1A4F84"
+        border.color:   _qgcPal.text
+    }
+
 
     property bool showIndicator: true
 

@@ -161,7 +161,8 @@ ApplicationWindow {
     }
 
     function showSettingsTool() {
-        showTool(qsTr("Application Settings"), "AppSettings.qml", "/res/QGCLogoWhite")
+//        showTool(qsTr("Application Settings"), "AppSettings.qml", "/res/QGCLogoWhite")
+        showTool(qsTr("Application Settings"), "AppSettings.qml", "/qmlimages/pyrotLog.png")
     }
 
     //-------------------------------------------------------------------------
@@ -329,7 +330,7 @@ ApplicationWindow {
     /// Toolbar
     header: MainToolBar {
         id:         toolbar
-        height:     ScreenTools.toolbarHeight
+        height:     ScreenTools.toolbarHeight + 5
         visible:    !QGroundControl.videoManager.fullScreen
     }
 
@@ -399,7 +400,8 @@ ApplicationWindow {
                         height:             _toolButtonHeight
                         Layout.fillWidth:   true
                         text:               qsTr("Application Settings")
-                        imageResource:      "/res/QGCLogoFull"
+//                        imageResource:      "/res/QGCLogoFull"
+                        imageResource:      "/qmlimages/pyrotLogo.png"
                         imageColor:         "transparent"
                         visible:            !QGroundControl.corePlugin.options.combineSettingsAndSetup
                         onClicked: {
@@ -414,14 +416,18 @@ ApplicationWindow {
                         width:      innerLayout.width
                         spacing:    0
 
+
+//                         custom added comment - this removes the text in the select tool tab menu
                         QGCLabel {
                             id:                     versionLabel
-                            text:                   qsTr("%1 Version").arg(QGroundControl.appName)
+//                            text:                   qsTr("%1 Version").arg(QGroundControl.appName)
+                            text:                   qsTr("")
                             font.pointSize:         ScreenTools.smallFontPointSize
                             wrapMode:               QGCLabel.WordWrap
                             Layout.maximumWidth:    parent.width
                             Layout.alignment:       Qt.AlignHCenter
                         }
+
 
                         QGCLabel {
                             text:                   QGroundControl.qgcVersion
@@ -432,7 +438,7 @@ ApplicationWindow {
 
                             QGCMouseArea {
                                 id:                 easterEggMouseArea
-                                anchors.topMargin:  -versionLabel.height
+                                anchors.topMargin:  versionLabel.height
                                 anchors.fill:       parent
 
                                 onClicked: {

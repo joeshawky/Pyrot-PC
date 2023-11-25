@@ -257,6 +257,8 @@ public:
     Q_PROPERTY(double               loadProgress                READ loadProgress                                                   NOTIFY loadProgressChanged)
     Q_PROPERTY(bool                 initialConnectComplete      READ isInitialConnectComplete                                       NOTIFY initialConnectComplete)
 
+    Q_PROPERTY(bool loadCustomAddedLentaComponents READ loadCustomAddedLentaComponents WRITE setLoadCustomAddedLentaComponents NOTIFY loadCustomAddedLentaComponentsChanged)
+
     // The following properties relate to Orbit status
     Q_PROPERTY(bool             orbitActive     READ orbitActive        NOTIFY orbitActiveChanged)
     Q_PROPERTY(QGCMapCircle*    orbitMapCircle  READ orbitMapCircle     CONSTANT)
@@ -331,6 +333,7 @@ public:
     Q_PROPERTY(QString  gitHash                     READ gitHash                    NOTIFY gitHashChanged)
     Q_PROPERTY(quint64  vehicleUID                  READ vehicleUID                 NOTIFY vehicleUIDChanged)
     Q_PROPERTY(QString  vehicleUIDStr               READ vehicleUIDStr              NOTIFY vehicleUIDChanged)
+
 
     /// Resets link status counters
     Q_INVOKABLE void resetCounters  ();
@@ -433,9 +436,22 @@ public:
     /// Trigger camera using MAV_CMD_DO_DIGICAM_CONTROL command
     Q_INVOKABLE void triggerSimpleCamera(void);
 
+
+
+    Q_INVOKABLE void sayHdgHoldState(bool hdgHoldState);
+    Q_INVOKABLE void sayAltHoldState(bool altHoldState);
+
+    Q_INVOKABLE void sayWelcome(void);
+
+    Q_INVOKABLE void sayCamRecordState(bool camRecordState);
+
+
 #if !defined(NO_ARDUPILOT_DIALECT)
     Q_INVOKABLE void flashBootloader();
 #endif
+
+
+
 
     bool    isInitialConnectComplete() const;
     bool    guidedModeSupported     () const;
@@ -597,6 +613,10 @@ public:
     bool            requiresGpsFix              () const { return static_cast<bool>(_onboardControlSensorsPresent & SysStatusSensorGPS); }
     bool            hilMode                     () const { return _base_mode & MAV_MODE_FLAG_HIL_ENABLED; }
     Actuators*      actuators                   () const { return _actuators; }
+
+
+    bool loadCustomAddedLentaComponents() const {return _loadCustomAddedLentaComponents;}
+
 
     /// Get the maximum MAVLink protocol version supported
     /// @return the maximum version
@@ -826,6 +846,15 @@ public:
     CheckList   checkListState          () { return _checkListState; }
     void        setCheckListState       (CheckList cl)  { _checkListState = cl; emit checkListStateChanged(); }
 
+    void setLoadCustomAddedLentaComponents(bool loadCustomAddedLentaComponents){
+        if(loadCustomAddedLentaComponents == _loadCustomAddedLentaComponents){
+            return;
+        }
+
+        _loadCustomAddedLentaComponents = loadCustomAddedLentaComponents;
+        emit loadCustomAddedLentaComponentsChanged();
+    }
+
     double loadProgress                 () const { return _loadProgress; }
 
     void setEventsMetadata(uint8_t compid, const QString& metadataJsonFileName, const QString& translationJsonFileName);
@@ -901,6 +930,9 @@ signals:
     void gitHashChanged                 (QString hash);
     void vehicleUIDChanged              ();
     void loadProgressChanged            (float value);
+
+    void loadCustomAddedLentaComponentsChanged();
+
 
     /// New RC channel values coming from RC_CHANNELS message
     ///     @param channelCount Number of available channels, cMaxRcChannels max
@@ -1123,6 +1155,7 @@ private:
     bool    _armed = false;         ///< true: vehicle is armed
     uint8_t _base_mode = 0;     ///< base_mode from HEARTBEAT
     uint32_t _custom_mode = 0;  ///< custom_mode from HEARTBEAT
+
 
     /// Used to store a message being sent by sendMessageMultiple
     typedef struct {
@@ -1375,6 +1408,9 @@ private:
     // Settings keys
     static const char* _settingsGroup;
     static const char* _joystickEnabledSettingsKey;
+
+    //Custom added variables
+    bool _loadCustomAddedLentaComponents = false;
 };
 
 Q_DECLARE_METATYPE(Vehicle::MavCmdResultFailureCode_t)

@@ -105,23 +105,23 @@ void MultiVideoManager::setToolbox(QGCToolbox *toolbox)
 
 void MultiVideoManager::init()
 {
-    QQuickWindow* root = qgcApp()->multiVideoWindow();
+//    QQuickWindow* root = qgcApp()->multiVideoWindow();
 
-    _updateVideoURI(0, _videoSettings->udpPort0()->rawValue().toInt());
-    _updateVideoURI(1, _videoSettings->udpPort1()->rawValue().toInt());
-    _updateVideoURI(2, _videoSettings->udpPort2()->rawValue().toInt());
+//    _updateVideoURI(0, _videoSettings->udpPort0()->rawValue().toInt());
+//    _updateVideoURI(1, _videoSettings->udpPort1()->rawValue().toInt());
+//    _updateVideoURI(2, _videoSettings->udpPort2()->rawValue().toInt());
 
-    if (root == nullptr) {
-        qCDebug(VideoManagerLog) << "multiVideoWindow() failed. No multi-video window";
-        return;
-    }
+//    if (root == nullptr) {
+//        qCDebug(VideoManagerLog) << "multiVideoWindow() failed. No multi-video window";
+//        return;
+//    }
 
-    QQuickItem* widget;
-    for (int i = 0; i < QGC_MULTI_VIDEO_COUNT; i++) {
-        widget = root->findChild<QQuickItem*>(QStringLiteral("videoContent%1").arg(i));
-        _videoSink[i] = qgcApp()->toolbox()->corePlugin()->createVideoSink(this, widget);
-        _startReceiver(i);
-    }
+//    QQuickItem* widget;
+//    for (int i = 0; i < QGC_MULTI_VIDEO_COUNT; i++) {
+//        widget = root->findChild<QQuickItem*>(QStringLiteral("videoContent%1").arg(i));
+//        _videoSink[i] = qgcApp()->toolbox()->corePlugin()->createVideoSink(this, widget);
+//        _startReceiver(i);
+//    }
 }
 
 void MultiVideoManager::startRecording(const QString &videoFile) {

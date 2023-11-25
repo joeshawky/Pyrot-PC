@@ -21,8 +21,16 @@ import QGroundControl.Controllers           1.0
 
 Rectangle {
     id:     _root
-    color:  qgcPal.toolbarBackground
+//    color:  qgcPal.toolbarBackground
 
+//    color: qgcPal.brandingBlue
+
+//    color: "#000099"
+//    color: "#0066CC"
+//    color: qgcPal.colorBlue
+//    color: "#000099"
+    color: "#1A4F84"
+//    color: "#00FF11"
     property int currentToolbar: flyViewToolbar
 
     readonly property int flyViewToolbar:   0
@@ -31,7 +39,12 @@ Rectangle {
 
     property var    _activeVehicle:     QGroundControl.multiVehicleManager.activeVehicle
     property bool   _communicationLost: _activeVehicle ? _activeVehicle.vehicleLinkManager.communicationLost : false
-    property color  _mainStatusBGColor: qgcPal.brandingPurple
+//    property color  _mainStatusBGColor: qgcPal.brandingPurple
+
+    property color  _mainStatusBGColor: qgcPal.colorBlue
+//    property color  _mainStatusBGColor: "#33FFFF"
+
+//    property color _mainStatusBGColor: "#2200FF"
 
     QGCPalette { id: qgcPal }
 
@@ -67,7 +80,9 @@ Rectangle {
         QGCToolBarButton {
             id:                     currentButton
             Layout.preferredHeight: viewButtonRow.height
-            icon.source:            "/res/QGCLogoFull"
+//            icon.source:            "/res/QGCLogoFull"
+            icon.source:        "/qmlimages/pyrotLogo.png"
+            icon.height: icon.height * 1.5
             logo:                   true
             onClicked:              mainWindow.showToolSelectDialog()
         }
@@ -85,6 +100,7 @@ Rectangle {
         }
     }
 
+
     QGCFlickable {
         id:                     toolsFlickable
         anchors.leftMargin:     ScreenTools.defaultFontPixelWidth * ScreenTools.largeFontPointRatio * 1.5
@@ -101,14 +117,17 @@ Rectangle {
             anchors.left:       parent.left
             anchors.top:        parent.top
             anchors.bottom:     parent.bottom
-            source:             currentToolbar === flyViewToolbar ?
-                                    "qrc:/toolbar/MainToolBarIndicators.qml" :
+            source:             currentToolbar === flyViewToolbar && _activeVehicle.loadCustomAddedLentaComponents ?
+                                    "qrc:/toolbar/customMainToolBarIndicators.qml" :
                                     (currentToolbar == planViewToolbar ? "qrc:/qml/PlanToolBarIndicators.qml" : "")
+            //"qrc:/toolbar/MainToolBarIndicators.qml"
         }
     }
 
+
     //-------------------------------------------------------------------------
     //-- Branding Logo
+  /*
     Image {
         anchors.right:          parent.right
         anchors.top:            parent.top
@@ -160,7 +179,7 @@ Rectangle {
             }
         }
     }
-
+*/
     // Small parameter download progress bar
     Rectangle {
         anchors.bottom: parent.bottom

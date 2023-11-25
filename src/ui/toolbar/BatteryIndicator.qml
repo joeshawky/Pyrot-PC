@@ -101,12 +101,12 @@ Item {
                 color:              getBatteryColor()
             }
 
-            QGCLabel {
-                text:                   getBatteryPercentageText()
-                font.pointSize:         ScreenTools.mediumFontPointSize
-                color:                  getBatteryColor()
-                anchors.verticalCenter: parent.verticalCenter
-            }
+//            QGCLabel {
+//                text:                   getBatteryPercentageText()
+//                font.pointSize:         ScreenTools.mediumFontPointSize
+//                color:                  getBatteryColor()
+//                anchors.verticalCenter: parent.verticalCenter
+//            }
         }
     }
 

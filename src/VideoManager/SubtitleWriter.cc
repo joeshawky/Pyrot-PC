@@ -24,6 +24,10 @@
 #include <QString>
 #include <QDate>
 
+
+#include<QDebug>
+
+
 QGC_LOGGING_CATEGORY(SubtitleWriterLog, "SubtitleWriterLog")
 
 const int SubtitleWriter::_sampleRate = 1; // Sample rate in Hz for getting telemetry data, most players do weird stuff when > 1Hz
@@ -44,13 +48,35 @@ void SubtitleWriter::startCapturingTelemetry(const QString& videoFile)
     grid->setProperty("userSettingsGroup", HorizontalFactValueGrid::telemetryBarUserSettingsGroup);
     grid->setProperty("defaultSettingsGroup", HorizontalFactValueGrid::telemetryBarDefaultSettingsGroup);
     grid->_loadSettings();
+
+
+
     for (int colIndex = 0; colIndex < grid->columns()->count(); colIndex++) {
         QmlObjectListModel* list = grid->columns()->value<QmlObjectListModel*>(colIndex);
         for (int rowIndex = 0; rowIndex < list->count(); rowIndex++) {
             InstrumentValueData* value = list->value<InstrumentValueData*>(rowIndex);
             _facts += value->fact();
+
         }
     }
+
+    auto *vehicle = qgcApp()->toolbox()->multiVehicleManager()->activeVehicle();
+    _facts.clear();
+
+    _facts += vehicle->getFact("apmSubInfo.lights1");
+    _facts += vehicle->getFact("apmSubInfo.lights2");
+    _facts += vehicle->getFact("FlightTime");
+    _facts += vehicle->getFact("temperature.temperature2");
+    _facts += vehicle->getFact("apmSubInfo.cameraTilt");
+    _facts += vehicle->getFact("apmSubInfo.pilotGain");
+    _facts += vehicle->getFact("apmSubInfo.tetherTurns");
+    _facts += vehicle->altitudeRelative();
+    _facts += vehicle->roll();
+
+//    _facts[0] = Fact();
+
+//    qInfo() << _facts;
+
     grid->deleteLater();
 
     // One subtitle always starts where the previous ended
@@ -115,12 +141,19 @@ void SubtitleWriter::_captureTelemetry()
     QStringList namesStrings;
     QStringList valuesStrings;
 
-    // Make a list of "factname:" strings and other with the values, so one can be aligned left and the other right
+//    // Make a list of "factname:" strings and other with the values, so one can be aligned left and the other right
     for (const Fact* fact : _facts) {
         valuesStrings << QStringLiteral("%2 %3").arg(fact->cookedValueString())
                                                 .arg(fact->cookedUnits());
         namesStrings << QStringLiteral("%1:").arg(fact->shortDescription());
     }
+
+
+
+//    for(int index=0; index< _facts.count(); index++){
+//        valuesStrings << QStringLiteral("Hi");
+//        namesStrings << QStringLiteral("Test");
+//    }
 
     // The time to start displaying this subtitle text
     QTime start = _lastEndTime;

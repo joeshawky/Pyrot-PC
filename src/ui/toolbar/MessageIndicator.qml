@@ -34,9 +34,11 @@ Item {
     function getMessageColor() {
         if (_activeVehicle) {
             if (_activeVehicle.messageTypeNone)
-                return qgcPal.colorGrey
+//                return qgcPal.colorGrey
+                return qgcPal.text
             if (_activeVehicle.messageTypeNormal)
-                return qgcPal.colorBlue;
+//                return qgcPal.colorBlue;
+                return qgcPal.colorGreen;
             if (_activeVehicle.messageTypeWarning)
                 return qgcPal.colorOrange;
             if (_activeVehicle.messageTypeError)
@@ -61,7 +63,8 @@ Item {
 
     QGCColoredImage {
         anchors.fill:       parent
-        source:             "/qmlimages/Megaphone.svg"
+//        source:             "/qmlimages/Megaphone.svg"
+        source: "/qmlimages/message_custom.png"
         sourceSize.height:  height
         fillMode:           Image.PreserveAspectFit
         color:              getMessageColor()

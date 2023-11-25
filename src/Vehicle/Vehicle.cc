@@ -4019,3 +4019,39 @@ void Vehicle::triggerSimpleCamera()
                    0.0, 0.0, 0.0, 0.0,          // param 1-4 unused
                    1.0);                        // trigger camera
 }
+
+
+
+void Vehicle::sayHdgHoldState(bool hdgHoldState)
+{
+    if(hdgHoldState == true){
+        _say(tr("Heading hold active"));
+    }else{
+        _say(tr("Heading hold not active"));
+    }
+}
+
+void Vehicle::sayAltHoldState(bool altHoldState)
+{
+    if(altHoldState == true){
+        _say(tr("Altitude hold active"));
+    }else{
+        _say(tr("Altitude hold not active"));
+    }
+}
+
+void Vehicle::sayWelcome(void)
+{
+//    _say(tr("Hosh geldin abi"));
+    _say(tr("Welcome lenta marine"));
+}
+
+void Vehicle::sayCamRecordState(bool camRecordState)
+{
+    if(camRecordState == true){
+        _say(tr("Camera recording active"));
+    }else{
+        _say(tr("Camera recording not active"));
+    }
+
+}
