@@ -2,7 +2,7 @@
 
 # New features
 - [x] Change app name to Lenta Ground Control Station.
-- [ ] Change app icon to Lenta Marine logo.  
+- [x] Change app icon to Lenta Marine logo.  
 
 # Old features
 - [x] 3 Extra livestream preview.
