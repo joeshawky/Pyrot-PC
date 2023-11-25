@@ -1,10 +1,11 @@
 # **Lenta Ground Ground**
 
 # New features
-- [x] 3 Extra livestream preview.
+- [x] Change app name to Lenta Ground Control Station.
+- [ ] Change app icon to Lenta Marine logo.  
 
 # Old features
-- [ ] None
+- [x] 3 Extra livestream preview.
 
 # Steps to build
 1. Clone the repository:
