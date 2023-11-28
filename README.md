@@ -17,7 +17,7 @@
    ```
    cd lenta-ground-control
    ```
-3. Update depencies by running the shell script update_dependencies:
+3. Update dependencies by running the shell script update_dependencies:
     ```
     ./update_dependencies.sh
     ```
