@@ -106,18 +106,25 @@ Item {
         visible:            !multiVehiclePanelSelector.showSingleVehiclePanel
     }
 
-    FlyViewInstrumentPanel {
-        id:                         instrumentPanel
-        anchors.margins:            _toolsMargin
-        anchors.top:                multiVehiclePanelSelector.visible ? multiVehiclePanelSelector.bottom : parent.top
-        anchors.right:              parent.right
-        width:                      _rightPanelWidth
-        spacing:                    _toolsMargin
-        visible:                    QGroundControl.corePlugin.options.flyView.showInstrumentPanel && multiVehiclePanelSelector.showSingleVehiclePanel
-        availableHeight:            parent.height - y - _toolsMargin
+    /*
+    The following component is the
+    fly view instrument panel at the
+    top right of the main screen.
+    it shows roll, pitch on the left
+    side and heading on the right side.
+    */
+//     FlyViewInstrumentPanel {
+//         id:                         instrumentPanel
+//         anchors.margins:            _toolsMargin
+//         anchors.top:                multiVehiclePanelSelector.visible ? multiVehiclePanelSelector.bottom : parent.top
+//         anchors.right:              parent.right
+//         width:                      _rightPanelWidth
+//         spacing:                    _toolsMargin
+//         visible:                    QGroundControl.corePlugin.options.flyView.showInstrumentPanel && multiVehiclePanelSelector.showSingleVehiclePanel
+//         availableHeight:            parent.height - y - _toolsMargin
 
-        property real rightInset: visible ? parent.width - x : 0
-    }
+//         property real rightInset: visible ? parent.width - x : 0
+//     }
 
     PhotoVideoControl {
         id:                     photoVideoControl
