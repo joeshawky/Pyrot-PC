@@ -257,6 +257,9 @@ public:
     Q_PROPERTY(double               loadProgress                READ loadProgress                                                   NOTIFY loadProgressChanged)
     Q_PROPERTY(bool                 initialConnectComplete      READ isInitialConnectComplete                                       NOTIFY initialConnectComplete)
 
+    // Lenta marine custom parameters
+    Q_PROPERTY(bool loadCustomAddedLentaComponents READ loadCustomAddedLentaComponents WRITE setLoadCustomAddedLentaComponents NOTIFY loadCustomAddedLentaComponentsChanged)
+
     // The following properties relate to Orbit status
     Q_PROPERTY(bool             orbitActive     READ orbitActive        NOTIFY orbitActiveChanged)
     Q_PROPERTY(QGCMapCircle*    orbitMapCircle  READ orbitMapCircle     CONSTANT)
@@ -432,11 +435,12 @@ public:
 
     /// Trigger camera using MAV_CMD_DO_DIGICAM_CONTROL command
     Q_INVOKABLE void triggerSimpleCamera(void);
-
+    
 #if !defined(NO_ARDUPILOT_DIALECT)
     Q_INVOKABLE void flashBootloader();
 #endif
 
+    
     bool    isInitialConnectComplete() const;
     bool    guidedModeSupported     () const;
     bool    pauseVehicleSupported   () const;
@@ -601,6 +605,8 @@ public:
     /// Get the maximum MAVLink protocol version supported
     /// @return the maximum version
     unsigned        maxProtoVersion         () const { return _maxProtoVersion; }
+
+    bool loadCustomAddedLentaComponents() const {return _loadCustomAddedLentaComponents;}
 
     enum CalibrationType {
         CalibrationRadio,
@@ -831,6 +837,15 @@ public:
     void setEventsMetadata(uint8_t compid, const QString& metadataJsonFileName, const QString& translationJsonFileName);
     void setActuatorsMetadata(uint8_t compid, const QString& metadataJsonFileName, const QString& translationJsonFileName);
 
+    void setLoadCustomAddedLentaComponents(bool loadCustomAddedLentaComponents){
+        if(loadCustomAddedLentaComponents == _loadCustomAddedLentaComponents){
+            return;
+        }
+
+        _loadCustomAddedLentaComponents = loadCustomAddedLentaComponents;
+        emit loadCustomAddedLentaComponentsChanged();
+    }
+
 public slots:
     void setVtolInFwdFlight                 (bool vtolInFwdFlight);
     void _offlineFirmwareTypeSettingChanged (QVariant varFirmwareType); // Should only be used by MissionControler to set firmware from Plan file
@@ -917,6 +932,8 @@ signals:
 
     // Mavlink Log Download
     void mavlinkLogData                 (Vehicle* vehicle, uint8_t target_system, uint8_t target_component, uint16_t sequence, uint8_t first_message, QByteArray data, bool acked);
+
+    void loadCustomAddedLentaComponentsChanged();
 
     /// Signalled in response to usage of sendMavCommand
     ///     @param vehicleId        Vehicle which command was sent to
@@ -1375,6 +1392,9 @@ private:
     // Settings keys
     static const char* _settingsGroup;
     static const char* _joystickEnabledSettingsKey;
+
+    //Custom added variables
+    bool _loadCustomAddedLentaComponents = false;
 };
 
 Q_DECLARE_METATYPE(Vehicle::MavCmdResultFailureCode_t)
