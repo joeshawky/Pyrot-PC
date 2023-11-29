@@ -290,4 +290,36 @@ Item {
         FlyViewPreFlightChecklistPopup {
         }
     }
+
+
+    /*
+    This timer runs every 2.5 seconds and 
+    sets loadCustomAddedLentaComponents variable
+    to true when all the parameters are loaded.
+    this is needed because if we try to load all custom
+    components without all the parameters loaded then
+    we get errors and none of our components would appear.
+    So we must add our custom components after all the
+    parameters are loaded
+    */
+    Timer{
+        interval: 2500
+        running: true
+        repeat: true
+        property bool   _communicationLost: _activeVehicle ? _activeVehicle.vehicleLinkManager.communicationLost : false
+        property bool   _paramsLoaded: _activeVehicle ? _activeVehicle.initialConnectComplete : false
+        property bool _toggle_btns_initialized : false
+
+        onTriggered: {
+            if (_communicationLost && _toggle_btns_initialized){
+                _activeVehicle.loadCustomAddedLentaComponents = false;
+                _toggle_btns_initialized = false;
+
+            } else if (_paramsLoaded && !_toggle_btns_initialized && !_communicationLost){
+                _activeVehicle.loadCustomAddedLentaComponents = true;
+                _toggle_btns_initialized = true;
+                _activeVehicle.sayWelcome();
+            }
+        }
+    }
 }
