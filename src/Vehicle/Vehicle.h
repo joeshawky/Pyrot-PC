@@ -440,6 +440,7 @@ public:
     Q_INVOKABLE void flashBootloader();
 #endif
 
+    Q_INVOKABLE void sayWelcome(void);
     
     bool    isInitialConnectComplete() const;
     bool    guidedModeSupported     () const;
