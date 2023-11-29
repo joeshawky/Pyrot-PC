@@ -23,7 +23,7 @@ QGCComboBox {
     anchors.verticalCenter: parent.verticalCenter
     alternateText:          _armed ? qsTr("Armed") : qsTr("Disarmed")
     model:                  [ qsTr("Arm"), qsTr("Disarm") ]
-    font.pointSize:         ScreenTools.mediumFontPointSize
+    font.pointSize:         ScreenTools.mediumFontPointSize * 0.65
     currentIndex:           -1
     sizeToContents:         true
 
@@ -31,6 +31,13 @@ QGCComboBox {
 
     property var    _activeVehicle: QGroundControl.multiVehicleManager.activeVehicle
     property bool   _armed:         _activeVehicle ? _activeVehicle.armed : false
+
+    background: Rectangle{
+            implicitWidth:  ScreenTools.implicitComboBoxWidth
+            implicitHeight: ScreenTools.implicitComboBoxHeight
+            color: "#1A4F84"
+            border.color:   _qgcPal.text
+    }
 
     onActivated: {
         if (index == 0) {
