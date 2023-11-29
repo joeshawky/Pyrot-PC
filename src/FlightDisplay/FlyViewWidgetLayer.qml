@@ -468,6 +468,247 @@ Item {
 
     }
 
+    Loader{
+            id: twoMainBarsLoader
+            width: 900
+            height: 600
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+            sourceComponent: (_activeVehicle.loadCustomAddedLentaComponents) ? twoMainBars : null
+
+        }
+
+        Component{
+            id: twoMainBars
+            Item{
+                id: mainBars
+                opacity: 1
+                anchors.fill: parent
+
+                function pitchBarOffset(pitchVal){
+                    return pitchVal * 30;
+                }
+
+                function depthBarOffset(depthVal){
+
+                    if(depthVal < -5){
+                        return (depthVal * 30) + 150;
+                    }
+
+                    return 0;
+                }
+
+                function depthBarArrowOffset(depthVal){
+                    if(depthVal >= -5){
+                        return -depthVal * 30;
+                    }
+
+                    return 150;
+                }
+
+
+                function crossHairAngle(rollVal){
+                    return rollVal;
+                }
+
+                //Pitch bar item
+                Item{
+                    id: clipItem
+                    anchors.left: parent.left
+                    height: parent.height
+                    width: 150
+                    clip: true
+
+
+                    Image{
+                        id: leftSidePitchBar
+
+                        source: "/qmlimages/pitchBar.svg"
+                        anchors.verticalCenter: _root.verticalCenter
+                        fillMode: Image.Pad
+                        smooth: true
+                        y: -2450
+                        transform: Translate{
+                            y: mainBars.pitchBarOffset(_activeVehicle.pitch.rawValue.toFixed(1))
+                        }
+
+                    }
+
+                }
+
+                //Pitch bar top horizon line
+                Rectangle{
+                    width: 45
+                    height: 5
+                    color: "#00FF38"
+                    anchors.bottom: clipItem.top
+                    anchors.horizontalCenter: clipItem.horizontalCenter
+                    z: 3
+                    visible: _activeVehicle.pitch.rawValue.toFixed(1) <= -10
+
+                }
+
+                //Pitch bar bottom horizon line
+                Rectangle{
+                    width: 45
+                    height: 5
+                    color: "#00FF38"
+                    anchors.top: clipItem.bottom
+                    anchors.horizontalCenter: clipItem.horizontalCenter
+                    z: 3
+                    visible: _activeVehicle.pitch.rawValue.toFixed(1) >= 10.5
+                }
+
+
+                //Pitch bar arrow
+                Item{
+                    id: pitchBarArrow
+                    width: 70
+                    height: 100
+                    anchors.horizontalCenter: clipItem.right
+                    anchors.verticalCenter: clipItem.verticalCenter
+                    anchors.verticalCenterOffset: 5
+                    Item{
+                        height: 35
+                        width: 35
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+
+                        Image{
+                            source: "/qmlimages/vehicleArrowOpaque.svg"
+                            anchors.fill: parent
+                            transform: Rotation{
+                                angle: 270
+
+                            }
+                        }
+
+
+
+
+                    }
+                    Text{
+                        anchors.bottom: parent.top
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.pixelSize: 25
+                        color: "white"
+                        text: `${_activeVehicle.pitch.rawValue.toFixed(1)}°`
+                        font.family:    ScreenTools.normalFontFamily
+                    }
+
+                }
+
+
+                //Depth bar item
+                Item{
+                    id: clipItemDepthBar
+                    anchors.right: parent.right
+                    height: parent.height
+                    width: 150
+                    clip: true
+
+
+                    Image{
+
+                        source: "/qmlimages/depthBar.svg"
+                        anchors.verticalCenter: _root.verticalCenter
+                        fillMode: Image.Pad
+                        smooth: true
+                        transform: Translate{
+                            y: mainBars.depthBarOffset(_activeVehicle.altitudeRelative.rawValue.toFixed(1))
+                        }
+
+                    }
+
+                }
+
+                //Depth bar arrow
+                Item{
+                    id: depthBarArrow
+                    width: 70
+                    height: 100
+                    anchors.horizontalCenter: clipItemDepthBar.left
+                    anchors.verticalCenter: clipItemDepthBar.top
+                    Item{
+                        id: depthBarArrowMovable
+
+                        height: 35
+                        width: 35
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.verticalCenterOffset: 30
+                        transform: Translate{
+                            y: mainBars.depthBarArrowOffset(_activeVehicle.altitudeRelative.rawValue.toFixed(1))
+                        }
+                        Image{
+                            source: "/qmlimages/vehicleArrowOpaque.svg"
+                            anchors.fill: parent
+                            transform: Rotation{
+                                angle: 90
+                            }
+                        }
+
+                    }
+
+                    Text{
+                        anchors.bottom: depthBarArrowMovable.top
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.horizontalCenterOffset: -5
+                        anchors.verticalCenterOffset: -5
+                        font.pixelSize: 25
+                        color: "white"
+                        text: `${_activeVehicle.altitudeRelative.rawValue.toFixed(1)}M`
+                        font.family:    ScreenTools.normalFontFamily
+
+                        transform: Translate{
+                            y: mainBars.depthBarArrowOffset(_activeVehicle.altitudeRelative.rawValue.toFixed(1))
+                        }
+                    }
+                }
+
+                //Cross hair item
+                Item{
+                    id: crossHairItem
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                    height: 100
+                    width: 100
+
+                    Image{
+                        id: crossHairIcon
+                        source: "/qmlimages/lentaCrossHair.svg"
+                        anchors.verticalCenter:parent.verticalCenter
+                        anchors.horizontalCenter: _root.horizontalCenter
+                        fillMode: Image.Pad
+                        smooth: true
+                        transform: Rotation{
+                            angle: mainBars.crossHairAngle(_activeVehicle.roll.rawValue.toFixed(1))
+                            origin.x: crossHairIcon.width/2
+                            origin.y: crossHairIcon.height/2
+                        }
+
+                    }
+                }
+
+                //Cross hair roll value
+                Item{
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.horizontalCenterOffset: -110
+                    anchors.verticalCenterOffset: -25
+                    Text{
+                        font.pixelSize: 25
+                        color: "white"
+                        text: `${_activeVehicle.roll.rawValue.toFixed(1)}°`
+                        font.family:    ScreenTools.normalFontFamily
+                    }
+                }
+
+
+
+            }
+        }
+
 
 
 

@@ -201,7 +201,9 @@
         <file alias="headlightsicon.svg">src/ui/toolbar/Images/headlightsicon.svg</file>
         <file alias="message_custom.png">src/ui/toolbar/Images/message_custom.png</file>
         <file alias="headingBar.svg">src/FlightMap/Images/headingBar.svg</file>
-        <file alias="pitchBar.png">src/FlightMap/Images/pitchBar.png</file>
+        <file alias="pitchBar.svg">src/FlightMap/Images/pitchBar.svg</file>
         <file alias="depthBar.svg">src/FlightMap/Images/depthBar.svg</file>
+        <file alias="lentaCrossHair.svg">src/FlightMap/Images/lentaCrossHair.svg</file>
+
     </qresource>
 </RCC>
