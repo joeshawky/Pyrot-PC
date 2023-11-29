@@ -199,6 +199,7 @@
         <file alias="pyrotLogo.png">src/ui/toolbar/Images/pyrotLogo.png</file>
         <file alias="thermometer_light.svg">src/ui/toolbar/Images/thermometer_light.svg</file>
         <file alias="headlightsicon.svg">src/ui/toolbar/Images/headlightsicon.svg</file>
+        <file alias="message_custom.png">src/ui/toolbar/Images/message_custom.png</file>
 
     </qresource>
 </RCC>
