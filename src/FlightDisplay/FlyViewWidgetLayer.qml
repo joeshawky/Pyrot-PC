@@ -322,4 +322,62 @@ Item {
             }
         }
     }
+
+     Loader{
+        id: videoLoader
+        sourceComponent: lentaVideoRecordingState
+        anchors.right: _root.right
+        anchors.top: _root.top
+    }
+
+    Component{
+        id: lentaVideoRecordingState
+
+        Item{
+            id: lentaVideoRecordingItem
+            height: 150
+            width: 250
+            visible: (QGroundControl.videoManager.recording)
+
+            Rectangle{
+                id: recordingTimer
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+
+                width: 40
+                height: 40
+                radius: 40
+
+                color: "red"
+
+                opacity: 0
+
+            }
+
+            Text{
+                anchors.left: recordingTimer.right
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.leftMargin: 15
+                color: "white"
+                font.pixelSize: 25
+                text: "Recording"
+                font.family:    ScreenTools.normalFontFamily
+            }
+
+            Timer{
+                interval: 500
+                running: true
+                repeat: true
+
+                onTriggered: {
+
+                    if(recordingTimer.opacity == 0){
+                        recordingTimer.opacity = 1;
+                    }else{
+                        recordingTimer.opacity = 0;
+                    }
+                }
+            }
+        }
+    }
 }
