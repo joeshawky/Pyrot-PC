@@ -126,101 +126,112 @@ Item {
 //         property real rightInset: visible ? parent.width - x : 0
 //     }
 
-    PhotoVideoControl {
-        id:                     photoVideoControl
-        anchors.margins:        _toolsMargin
-        anchors.right:          parent.right
-        width:                  _rightPanelWidth * 0.55
-        anchors.bottom: parent.bottom
-        states: [
-            State {
-                name: "verticalCenter"
-                AnchorChanges {
-                    target:                 photoVideoControl
-                    anchors.top:            undefined
-                    anchors.verticalCenter: _root.verticalCenter
-                }
-            },
-            State {
-                name: "topAnchor"
-                AnchorChanges {
-                    target:                 photoVideoControl
-                    anchors.verticalCenter: undefined
-                    anchors.top:            instrumentPanel.bottom
-                }
-            }
-        ]
+    /*
+    The following component is the video control block
+    from which you can start recording, and capture 
+    pictures.
+    */
 
-        property bool _verticalCenter: !QGroundControl.settingsManager.flyViewSettings.alternateInstrumentPanel.rawValue
-    }
+    // PhotoVideoControl {
+    //     id:                     photoVideoControl
+    //     anchors.margins:        _toolsMargin
+    //     anchors.right:          parent.right
+    //     width:                  _rightPanelWidth * 0.55
+    //     anchors.bottom: parent.bottom
+    //     states: [
+    //         State {
+    //             name: "verticalCenter"
+    //             AnchorChanges {
+    //                 target:                 photoVideoControl
+    //                 anchors.top:            undefined
+    //                 anchors.verticalCenter: _root.verticalCenter
+    //             }
+    //         },
+    //         State {
+    //             name: "topAnchor"
+    //             AnchorChanges {
+    //                 target:                 photoVideoControl
+    //                 anchors.verticalCenter: undefined
+    //                 anchors.top:            instrumentPanel.bottom
+    //             }
+    //         }
+    //     ]
 
-    TelemetryValuesBar {
-        id:                 telemetryPanel
-        x:                  recalcXPosition()
-        anchors.margins:    _toolsMargin
+    //     property bool _verticalCenter: !QGroundControl.settingsManager.flyViewSettings.alternateInstrumentPanel.rawValue
+    // }
 
-        // States for custom layout support
-        states: [
-            State {
-                name: "bottom"
-                when: telemetryPanel.bottomMode
+    /*
+    The following component shows parameters values in a
+    small block on the main screen.
+    */
 
-                AnchorChanges {
-                    target: telemetryPanel
-                    anchors.top: undefined
-                    anchors.bottom: parent.bottom
-                    anchors.right: undefined
-                    anchors.verticalCenter: undefined
-                }
+    // TelemetryValuesBar {
+    //     id:                 telemetryPanel
+    //     x:                  recalcXPosition()
+    //     anchors.margins:    _toolsMargin
+        
+    //     // States for custom layout support
+    //     states: [
+    //         State {
+    //             name: "bottom"
+    //             when: telemetryPanel.bottomMode
 
-                PropertyChanges {
-                    target: telemetryPanel
-                    x: recalcXPosition()
-                }
-            },
+    //             AnchorChanges {
+    //                 target: telemetryPanel
+    //                 anchors.top: undefined
+    //                 anchors.bottom: parent.bottom
+    //                 anchors.right: undefined
+    //                 anchors.verticalCenter: undefined
+    //             }
 
-            State {
-                name: "right-video"
-                when: !telemetryPanel.bottomMode && photoVideoControl.visible
+    //             PropertyChanges {
+    //                 target: telemetryPanel
+    //                 x: recalcXPosition()
+    //             }
+    //         },
 
-                AnchorChanges {
-                    target: telemetryPanel
-                    anchors.top: photoVideoControl.bottom
-                    anchors.bottom: undefined
-                    anchors.right: parent.right
-                    anchors.verticalCenter: undefined
-                }
-            },
+    //         State {
+    //             name: "right-video"
+    //             when: !telemetryPanel.bottomMode && photoVideoControl.visible
 
-            State {
-                name: "right-novideo"
-                when: !telemetryPanel.bottomMode && !photoVideoControl.visible
+    //             AnchorChanges {
+    //                 target: telemetryPanel
+    //                 anchors.top: photoVideoControl.bottom
+    //                 anchors.bottom: undefined
+    //                 anchors.right: parent.right
+    //                 anchors.verticalCenter: undefined
+    //             }
+    //         },
 
-                AnchorChanges {
-                    target: telemetryPanel
-                    anchors.top: undefined
-                    anchors.bottom: undefined
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-            }
-        ]
+    //         State {
+    //             name: "right-novideo"
+    //             when: !telemetryPanel.bottomMode && !photoVideoControl.visible
 
-        function recalcXPosition() {
-            // First try centered
-            var halfRootWidth   = _root.width / 2
-            var halfPanelWidth  = telemetryPanel.width / 2
-            var leftX           = (halfRootWidth - halfPanelWidth) - _toolsMargin
-            var rightX          = (halfRootWidth + halfPanelWidth) + _toolsMargin
-            if (leftX >= parentToolInsets.leftEdgeBottomInset || rightX <= parentToolInsets.rightEdgeBottomInset ) {
-                // It will fit in the horizontalCenter
-                return halfRootWidth - halfPanelWidth
-            } else {
-                // Anchor to left edge
-                return parentToolInsets.leftEdgeBottomInset + _toolsMargin
-            }
-        }
-    }
+    //             AnchorChanges {
+    //                 target: telemetryPanel
+    //                 anchors.top: undefined
+    //                 anchors.bottom: undefined
+    //                 anchors.right: parent.right
+    //                 anchors.verticalCenter: parent.verticalCenter
+    //             }
+    //         }
+    //     ]
+
+    //     function recalcXPosition() {
+    //         // First try centered
+    //         var halfRootWidth   = _root.width / 2
+    //         var halfPanelWidth  = telemetryPanel.width / 2
+    //         var leftX           = (halfRootWidth - halfPanelWidth) - _toolsMargin
+    //         var rightX          = (halfRootWidth + halfPanelWidth) + _toolsMargin
+    //         if (leftX >= parentToolInsets.leftEdgeBottomInset || rightX <= parentToolInsets.rightEdgeBottomInset ) {
+    //             // It will fit in the horizontalCenter
+    //             return halfRootWidth - halfPanelWidth
+    //         } else {
+    //             // Anchor to left edge
+    //             return parentToolInsets.leftEdgeBottomInset + _toolsMargin
+    //         }
+    //     }
+    // }
 
     //-- Virtual Joystick
     Loader {
@@ -380,4 +391,85 @@ Item {
             }
         }
     }
+
+
+
+    Loader{
+        id: headingBarComponentLoader
+        width: 1200
+        height: 150
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top : parent.top
+        sourceComponent: (_activeVehicle.loadCustomAddedLentaComponents) ? headingBarComponent : null
+
+    }
+
+    Component{
+        id: headingBarComponent
+
+        //Heading bar item and arrow
+        Item{
+            anchors.fill: parent
+            clip: true
+            id: barFuncs
+            function headingBarOffset(headingVal){
+                return -headingVal * 34.2;
+            }
+
+
+            Image{
+
+                source: "/qmlimages/headingBar.svg"
+                anchors.verticalCenter: _root.verticalCenter
+                fillMode: Image.Pad
+                smooth: true
+                x: -655
+                transform: Translate{
+                    x: barFuncs.headingBarOffset(_activeVehicle.heading.rawValue.toFixed(1))
+                }
+
+
+            }
+
+            Item{
+                width: 100
+                height: 100
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.bottom
+                anchors.verticalCenterOffset: -30
+                Item{
+                    id: headingBarArrow
+                    height: 50
+                    width: 50
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenterOffset: -35
+                    Image{
+                        source: "/qmlimages/vehicleArrowOpaque.svg"
+                        anchors.fill: parent
+                    }
+
+
+
+
+                }
+                Text{
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    font.pixelSize: 25
+                    color: "white"
+                    text: `${_activeVehicle.heading.rawValue.toFixed(0)}°`
+                    font.family:    ScreenTools.normalFontFamily
+                }
+
+            }
+        }
+
+
+    }
+
+
+
+
+
 }
