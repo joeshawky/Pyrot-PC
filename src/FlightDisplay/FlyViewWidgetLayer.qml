@@ -240,20 +240,25 @@ Item {
         property bool _virtualJoystickEnabled: QGroundControl.settingsManager.appSettings.virtualJoystick.rawValue
     }
 
-    FlyViewToolStrip {
-        id:                     toolStrip
-        anchors.leftMargin:     _toolsMargin + parentToolInsets.leftEdgeCenterInset
-        anchors.topMargin:      _toolsMargin + parentToolInsets.topEdgeLeftInset
-        anchors.left:           parent.left
-        anchors.top:            parent.top
-        z:                      QGroundControl.zOrderWidgets
-        maxHeight:              parent.height - y - parentToolInsets.bottomEdgeLeftInset - _toolsMargin
-        visible:                !QGroundControl.videoManager.fullScreen
+    /*
+    The next component is the 3 buttons on the top left 
+    of the main screen. if you want it to be shown then
+    uncomment the following component.
+    */
+    // FlyViewToolStrip {
+    //     id:                     toolStrip
+    //     anchors.leftMargin:     _toolsMargin + parentToolInsets.leftEdgeCenterInset
+    //     anchors.topMargin:      _toolsMargin + parentToolInsets.topEdgeLeftInset
+    //     anchors.left:           parent.left
+    //     anchors.top:            parent.top
+    //     z:                      QGroundControl.zOrderWidgets
+    //     maxHeight:              parent.height - y - parentToolInsets.bottomEdgeLeftInset - _toolsMargin
+    //     visible:                !QGroundControl.videoManager.fullScreen
 
-        onDisplayPreFlightChecklist: mainWindow.showPopupDialogFromComponent(preFlightChecklistPopup)
+    //     onDisplayPreFlightChecklist: mainWindow.showPopupDialogFromComponent(preFlightChecklistPopup)
 
-        property real leftInset: x + width
-    }
+    //     property real leftInset: x + width
+    // }
 
     FlyViewAirspaceIndicator {
         anchors.top:                parent.top
