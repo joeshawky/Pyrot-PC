@@ -161,7 +161,8 @@ ApplicationWindow {
     }
 
     function showSettingsTool() {
-        showTool(qsTr("Application Settings"), "AppSettings.qml", "/res/QGCLogoWhite")
+        // showTool(qsTr("Application Settings"), "AppSettings.qml", "/res/QGCLogoWhite")
+        showTool(qsTr("Application Settings"), "AppSettings.qml", "/qmlimages/pyrotLog.png")
     }
 
     //-------------------------------------------------------------------------
@@ -399,7 +400,9 @@ ApplicationWindow {
                         height:             _toolButtonHeight
                         Layout.fillWidth:   true
                         text:               qsTr("Application Settings")
-                        imageResource:      "/res/QGCLogoFull"
+                        // imageResource:      "/res/QGCLogoFull"
+                        imageResource:      "/qmlimages/pyrotLogo.png"
+
                         imageColor:         "transparent"
                         visible:            !QGroundControl.corePlugin.options.combineSettingsAndSetup
                         onClicked: {
