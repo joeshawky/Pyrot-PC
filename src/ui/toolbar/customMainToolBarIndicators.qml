@@ -40,6 +40,7 @@ Row {
     property Fact recordToggle: controller.getParameterFact(-1, "RECORDING_TOGGLE")
     property bool recordToggleExists: controller.parameterExists(-1, "RECORDING_TOGGLE")
 
+    property Fact rangeFinderDistance: controller.vehicle.getFact("apmSubInfo.rangefinderDistance")
 
     function temperatureValue(){
         return (temperatureTwo.value) ? temperatureTwo.value : "0"
@@ -318,6 +319,40 @@ Row {
             font.pixelSize: 20;
             color: "white";
             text: `${_activeVehicle.altitudeRelative.rawValue.toFixed(1)} M`;
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 12
+            anchors.horizontalCenter: parent.horizontalCenter
+            font.family:    ScreenTools.normalFontFamily
+
+        }
+    }
+
+    Rectangle{
+        width: 1
+        height: parent.height
+        color: "white"
+    }
+
+    //Echosounder
+    Item{
+        width: 55
+        height: parent.height
+
+        Text{
+            font.pixelSize: 12;
+            color: "white";
+            text: "Echosounder";
+            anchors.horizontalCenter: parent.horizontalCenter;
+            anchors.top: parent.top;
+            anchors.topMargin: 3
+            font.family:    ScreenTools.normalFontFamily
+        }
+
+        Text{
+            font.pixelSize: 20;
+            color: "white";
+            text: `${indicatorRow.rangeFinderDistance.value.toFixed(1)} M`;
+//            text: `xxxx M`
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 12
             anchors.horizontalCenter: parent.horizontalCenter
