@@ -623,7 +623,7 @@ VideoManager::_initVideo()
         qCDebug(VideoManagerLog) << "thermal video receiver disabled";
     }
 
-    _multiVideoManager->init();
+//    _multiVideoManager->init();
 #endif
 }
 
