@@ -8,8 +8,9 @@
 - [x] Add heading bar
 - [x] Add toolbar to the left of the screen
 - [x] Change all fonts to "Comic Sans MS"
-  
+- [x] Configure subtitles to user needs
 
+  
 # Old features
 - [x] Move video control block to bottom right
 - [x] Create a red flashing circle when a video is being recorded
