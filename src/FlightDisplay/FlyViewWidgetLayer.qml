@@ -22,7 +22,6 @@ import QGroundControl.Controls      1.0
 import QGroundControl.Airspace      1.0
 import QGroundControl.Airmap        1.0
 import QGroundControl.Controllers   1.0
-import QGroundControl.Controls      1.0
 import QGroundControl.FactSystem    1.0
 import QGroundControl.FlightDisplay 1.0
 import QGroundControl.FlightMap     1.0
@@ -48,6 +47,8 @@ Item {
     property real   _toolsMargin:           ScreenTools.defaultFontPixelWidth * 0.75
     property rect   _centerViewport:        Qt.rect(0, 0, width, height)
     property real   _rightPanelWidth:       ScreenTools.defaultFontPixelWidth * 30
+
+    property real _toolIndicatorMargins:    ScreenTools.defaultFontPixelHeight * 0.33
 
     QGCToolInsets {
         id:                     _totalToolInsets
@@ -128,7 +129,7 @@ Item {
 
     /*
     The following component is the video control block
-    from which you can start recording, and capture 
+    from which you can start recording, and capture
     pictures.
     */
 
@@ -169,7 +170,7 @@ Item {
     //     id:                 telemetryPanel
     //     x:                  recalcXPosition()
     //     anchors.margins:    _toolsMargin
-        
+
     //     // States for custom layout support
     //     states: [
     //         State {
@@ -252,7 +253,7 @@ Item {
     }
 
     /*
-    The next component is the 3 buttons on the top left 
+    The next component is the 3 buttons on the top left
     of the main screen. if you want it to be shown then
     uncomment the following component.
     */
@@ -284,17 +285,17 @@ Item {
         z:                  QGroundControl.zOrderTopMost
     }
 
-    MapScale {
-        id:                 mapScale
-        anchors.margins:    _toolsMargin
-        anchors.left:       toolStrip.right
-        anchors.top:        parent.top
-        mapControl:         _mapControl
-        buttonsOnLeft:      false
-        visible:            !ScreenTools.isTinyScreen && QGroundControl.corePlugin.options.flyView.showMapScale && mapControl.pipState.state === mapControl.pipState.fullState
+    // MapScale {
+    //     id:                 mapScale
+    //     anchors.margins:    _toolsMargin
+    //     anchors.left:       toolStrip.right
+    //     anchors.top:        parent.top
+    //     mapControl:         _mapControl
+    //     buttonsOnLeft:      false
+    //     visible:            !ScreenTools.isTinyScreen && QGroundControl.corePlugin.options.flyView.showMapScale && mapControl.pipState.state === mapControl.pipState.fullState
 
-        property real centerInset: visible ? parent.height - y : 0
-    }
+    //     property real centerInset: visible ? parent.height - y : 0
+    // }
 
     Component {
         id: preFlightChecklistPopup
@@ -304,7 +305,7 @@ Item {
 
 
     /*
-    This timer runs every 2.5 seconds and 
+    This timer runs every 2.5 seconds and
     sets loadCustomAddedLentaComponents variable
     to true when all the parameters are loaded.
     this is needed because if we try to load all custom
@@ -334,11 +335,17 @@ Item {
         }
     }
 
-     Loader{
+    Loader{
         id: videoLoader
         sourceComponent: lentaVideoRecordingState
-        anchors.right: _root.right
-        anchors.top: _root.top
+        height: _root.height * 0.1
+        width: _root.width * 0.1
+        anchors{
+            right: _root.right
+            top: _root.top
+            topMargin: height * 0.5
+            rightMargin: width * 0.5
+        }
     }
 
     Component{
@@ -346,42 +353,39 @@ Item {
 
         Item{
             id: lentaVideoRecordingItem
-            height: 150
-            width: 250
+            anchors.fill: parent
             visible: (QGroundControl.videoManager.recording)
 
             Rectangle{
                 id: recordingTimer
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
-
-                width: 40
-                height: 40
-                radius: 40
-
+                anchors{
+                    left: parent.left
+                    verticalCenter: parent.verticalCenter
+                }
+                width: parent.width * 0.13
+                height: width
+                radius: width
                 color: "red"
-
                 opacity: 0
-
             }
 
             Text{
-                anchors.left: recordingTimer.right
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.leftMargin: 15
-                color: "white"
-                font.pixelSize: 25
-                text: "Recording"
+                anchors{
+                    left: recordingTimer.right
+                    leftMargin: ScreenTools.defaultFontPixelHeight * 0.5
+                    verticalCenter: parent.verticalCenter
+                }
                 font.family:    ScreenTools.normalFontFamily
+                font.pointSize: ScreenTools.defaultFontPointSize * 1.5
+                color: "white"
+                text: "Recording"
             }
 
             Timer{
                 interval: 500
                 running: true
                 repeat: true
-
                 onTriggered: {
-
                     if(recordingTimer.opacity == 0){
                         recordingTimer.opacity = 1;
                     }else{
@@ -396,929 +400,1000 @@ Item {
 
     Loader{
         id: headingBarComponentLoader
-        width: 1200
-        height: 150
+        width: _root.width * 0.9
+        height: _root.height * 0.15
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top : parent.top
-        sourceComponent: (_activeVehicle.loadCustomAddedLentaComponents) ? headingBarComponent : null
 
+        sourceComponent: (_activeVehicle.loadCustomAddedLentaComponents) ? headingBarComponent : null
     }
 
     Component{
         id: headingBarComponent
-
-        //Heading bar item and arrow
         Item{
-            anchors.fill: parent
-            clip: true
-            id: barFuncs
-            function headingBarOffset(headingVal){
-                return -headingVal * 34.2;
+            // color: "yellow"
+            id: headingBarItem
+            width: parent.width
+            anchors{
+                top: parent.top
+                bottom: parent.bottom
             }
 
-
-            Image{
-
-                source: "/qmlimages/headingBar.svg"
-                anchors.verticalCenter: _root.verticalCenter
-                fillMode: Image.Pad
-                smooth: true
-                x: -655
-                transform: Translate{
-                    x: barFuncs.headingBarOffset(_activeVehicle.heading.rawValue.toFixed(1))
-                }
-
-
-            }
+            property real headingBarToothWidth: width * 0.1 * 0.2
+            property real initialXOffset: 35
 
             Item{
-                width: 100
-                height: 100
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.bottom
-                anchors.verticalCenterOffset: -30
-                Item{
-                    id: headingBarArrow
-                    height: 50
-                    width: 50
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.verticalCenterOffset: -35
-                    Image{
-                        source: "/qmlimages/vehicleArrowOpaque.svg"
-                        anchors.fill: parent
+                id: headingBarRow
+                // color: "blue"
+                height: parent.height * 0.2
+                width: parent.width
+                anchors{
+                    top: parent.top
+                    horizontalCenter: parent.horizontalCenter
+                }
+
+                ListModel {
+                    id: headingBarValues
+                    Component.onCompleted: {
+                        let i = 0;
+
+                        for(i = 300; i <= 359; i += 1)
+                        {
+                            if (i % 5 == 0){
+                                headingBarValues.append({"index": i, "type": "line"})
+                            }else{
+                                headingBarValues.append({"index": i, "type": "no-line"});
+                            }
+
+                        }
+                        for(i = 0; i <= 359; i += 1)
+                        {
+                            if (i % 5 == 0){
+                                headingBarValues.append({"index": i, "type": "line"})
+                            }else{
+                                headingBarValues.append({"index": i, "type": "no-line"});
+                            }
+                        }
+                        for(i = 0; i <= 60; i += 1)
+                        {
+                            if (i % 5 == 0){
+                                headingBarValues.append({"index": i, "type": "line"})
+                            }else{
+                                headingBarValues.append({"index": i, "type": "no-line"});
+                            }
+                        }
+                    }
+                }
+
+                ListView{
+                    id: headingBarListView
+                    model: headingBarValues
+                    orientation: Qt.Horizontal
+                    layoutDirection: Qt.LeftToRight
+                    width: headingBarRow.width
+                    height: headingBarRow.height
+                    interactive: false
+
+
+                    Component.onCompleted: {
+                        let heading = _activeVehicle.heading.rawValue.toFixed(0);
+                        headingBarListView.positionViewAtIndex(headingBarItem.initialXOffset + Number(heading), ListView.Beginning)
+                    }
+
+                    Connections{
+                        target: _activeVehicle.heading
+                        onValueChanged: {
+                            let heading = _activeVehicle.heading.rawValue.toFixed(0);
+                            headingBarListView.positionViewAtIndex(headingBarItem.initialXOffset + Number(heading), ListView.Beginning)
+                        }
                     }
 
 
+                    delegate: Item{
+                        // color: model.index % 2 == 0 ? "red" : "blue"
+                        height: headingBarListView.height
+                        width: headingBarItem.headingBarToothWidth
+                        // border.width: 2
+                        // border.color: "red"
 
 
+                        Text{
+                            anchors{
+                                top: parent.top
+                                horizontalCenter: parent.left
+                            }
+                            font.pointSize: ScreenTools.defaultFontPointSize
+                            font.bold: true
+                            color: "white"
+                            // text: `${index}°`
+                            text: {
+                                switch (model.type){
+                                case "line":
+                                    return `${model.index}°`;
+                                default:
+                                    return ``;
+                                }
+                            }
+                        }
+
+                        Item{
+                            anchors{
+                                top: parent.children[0].bottom
+                                bottom: parent.bottom
+                                topMargin: _toolIndicatorMargins * 0.35
+                                horizontalCenter: parent.left
+                            }
+                            width: 3
+                            Rectangle{
+                                visible: model.type === "line" ? true : false
+                                anchors.fill: parent
+                                color: "white"
+                            }
+                        }
+                    }
+                }
+            }
+
+            Item{
+                // color: "blue"
+                id: headingBarArrowItem
+
+                anchors{
+                    top: headingBarRow.bottom
+                    horizontalCenter: parent.horizontalCenter
+                    topMargin: _toolIndicatorMargins * 0.5
+                }
+                height: 0.8 * parent.height - headingBarRow.height
+                width: parent.width * 0.05
+                y: parent.height * 0.1
+                Item{
+                    id: headingBarArrowIcon
+                    anchors{
+                        top: parent.top
+                        horizontalCenter: parent.horizontalCenter
+                    }
+                    height: parent.height * 0.5
+                    width: parent.width
+                    Image{
+                        height: parent.height
+                        anchors.centerIn: parent
+                        source: "/qmlimages/vehicleArrowOpaque.svg"
+                        fillMode: Image.PreserveAspectFit
+                    }
                 }
                 Text{
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    font.pixelSize: 25
-                    color: "white"
+                    anchors{
+                        top: headingBarArrowIcon.bottom
+                        horizontalCenter: parent.horizontalCenter
+                    }
                     text: `${_activeVehicle.heading.rawValue.toFixed(0)}°`
-                    font.family:    ScreenTools.normalFontFamily
+                    color: "white"
+                    font.pointSize: ScreenTools.defaultFontPointSize * 1.5
+                    font.bold: true
                 }
-
             }
+
         }
-
-
     }
 
     Loader{
-            id: twoMainBarsLoader
-            width: 900
-            height: 600
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.verticalCenter: parent.verticalCenter
-            sourceComponent: (_activeVehicle.loadCustomAddedLentaComponents) ? twoMainBars : null
+        id: pitchBarComponentLoader
+        anchors{
+            verticalCenter: _root.verticalCenter
+        }
+        width: _root.width * 0.2
+        height: _root.height * 0.72
+        x: _root.width * 0.3 - width * 0.5
+        sourceComponent: (_activeVehicle.loadCustomAddedLentaComponents) ? pitchBarComponent : null
+
+        anchors.margins: 0
 
     }
 
     Component{
-        id: twoMainBars
+        id: pitchBarComponent
+
         Item{
-            id: mainBars
-            opacity: 1
+            id: pitchBarItem
+            clip: true
+
+            property double pitchBarHeightMultiplier: 0.08
+            property double pitchBarToothHeight: _root.height * 0.72 * 0.08 * 0.2
+            property double initialYOffset: 845
+
+            Item{
+                // color: "blue"
+                id: pitchBarColumn
+                anchors{
+                    left: parent.left
+                }
+                height: parent.height
+                width: parent.width * 0.27
+
+                ListModel {
+                    id: pitchBarValues
+                    Component.onCompleted: {
+
+                        for(let i = 875; i >= -875; i--)
+                        {
+                            if (i == 875 || (i - 875) % 25 == 0){
+                                pitchBarValues.append({"index": i, "type": "long-line"})
+                            } else if ((i - 875) % 5 == 0)
+                            {
+                                pitchBarValues.append({"index": i, "type": "short-line"})
+                            } else{
+                                pitchBarValues.append({"index": i, "type": "no-line"});
+                            }
+                        }
+                    }
+                }
+
+                ListView{
+                    id: pitchBarListView
+                    model: pitchBarValues
+                    height: parent.height
+                    width: parent.width
+                    interactive: false
+
+                    Component.onCompleted: {
+                        let pitch = _activeVehicle.pitch.rawValue.toFixed(1);
+                        pitchBarListView.positionViewAtIndex(pitchBarItem.initialYOffset + pitch * -5, ListView.Beginning)
+                    }
+
+                    Connections{
+                        id: pitchConnection
+                        target: _activeVehicle.pitch
+                        onValueChanged: {
+                            let pitch = _activeVehicle.pitch.rawValue.toFixed(1);
+                            pitchBarListView.positionViewAtIndex(pitchBarItem.initialYOffset + pitch * -5, ListView.Beginning)
+                        }
+                    }
+
+                    delegate: Item{
+                        // color: model.index % 2 == 0 ? "red" : "blue"
+                        height: pitchBarItem.pitchBarToothHeight
+                        width: pitchBarColumn.width
+
+
+
+                        Item{
+                            anchors{
+                                left: parent.left
+                                verticalCenter: parent.top
+                            }
+                            width: parent.width * 0.5
+
+                            Text{
+                                anchors.centerIn: parent
+                                font.pointSize: ScreenTools.defaultFontPointSize
+                                font.bold: true
+                                color: "white"
+                                text: {
+                                    // return model.index % 5 == 0 ? `${model.index}°` : ``
+                                    switch (model.type){
+                                    case "long-line":
+                                        return `${model.index * 0.2}°`
+
+                                    default:
+                                        return ``
+                                    }
+                                }
+                            }
+                        }
+
+
+                        Item{
+                            anchors{
+                                left: parent.children[0].right
+                                leftMargin: _toolIndicatorMargins * 0.25
+                                verticalCenter: parent.top
+                                right: parent.right
+                            }
+                            height: parent.height
+
+
+                            Rectangle{
+                                anchors.centerIn: parent
+                                height: 3
+                                // width: model.index % 5 == 0 ? parent.width : parent.width * 0.75
+                                width: {
+                                    switch (model.type){
+                                    case "long-line":
+                                        return parent.width
+                                    case "short-line":
+                                        return parent.width * 0.75
+                                    case "no-line":
+                                        return 0
+                                    }
+                                }
+
+                                color: "white"
+
+
+                            }
+                        }
+                    }
+
+                }
+            }
+
+
+            Item{
+                // color: "blue"
+                id: pitchBarArrowItem
+                anchors{
+                    right: parent.right
+                }
+                height: parent.height
+                width: parent.width - pitchBarColumn.width - _toolIndicatorMargins
+
+                Item{
+                    // color: "green"
+                    height: pitchBarItem.pitchBarToothHeight * 5
+                    width: parent.width
+                    y: pitchBarItem.pitchBarToothHeight * 30
+                    Image{
+                        id: pitchBarArrowIcon
+                        anchors{
+                            left: parent.left
+                            leftMargin: _toolIndicatorMargins
+                            verticalCenter: parent.top
+                        }
+                        height: parent.height
+                        rotation: -90
+                        source: "/qmlimages/vehicleArrowOpaque.svg"
+                        fillMode: Image.PreserveAspectFit
+                    }
+                    Text{
+                        anchors{
+                            left: pitchBarArrowIcon.right
+                            verticalCenter: parent.top
+                        }
+                        text: `${_activeVehicle.pitch.rawValue.toFixed(1)}°`
+                        color: "white"
+                        font.pointSize: ScreenTools.defaultFontPointSize * 1.5
+                        font.bold: true
+                    }
+                }
+
+            }
+        }
+    }
+
+
+    Loader{
+        id: depthBarComponentLoader
+        anchors{
+            verticalCenter: _root.verticalCenter
+        }
+        width: _root.width * 0.2
+        // height: _root.height * 0.72
+        height: _root.height * 0.864
+        x: _root.width * 0.7 - width * 0.5
+        sourceComponent: (_activeVehicle.loadCustomAddedLentaComponents) ? depthBarComponent : null
+    }
+
+
+    Component{
+        id: depthBarComponent
+
+        Item{
+            id: depthBarItem
+            anchors.fill: parent
+            clip: true
+
+            property real depthBarHeightMultiplier: 0.08
+            property real depthBarToothHeight: height * 0.8 * depthBarHeightMultiplier * 0.2
+            property real initialYOffset: 25 * depthBarToothHeight
+
+            Item{
+                id: depthBarColumn
+                anchors{
+                    right: parent.right
+                    verticalCenter: parent.verticalCenter
+                }
+                // height: parent.height
+                height: parent.height * 0.8
+                // width: parent.width * 0.27
+                width: parent.width * 0.405
+
+                ListModel {
+                    id: depthBarValues
+                    Component.onCompleted: {
+                        for(let i = 0; i <= 5000; i++)
+                        {
+                            if (i % 25 == 0)
+                            {
+                                depthBarValues.append({"index": i, "type": "long-line"});
+                            }else if (i % 5 == 0){
+                                depthBarValues.append({"index": i, "type": "short-line"});
+                            }else {
+                                depthBarValues.append({"index": i, "type": "no-line"});
+                            }
+                        }
+                    }
+                }
+                ListView{
+                    id: depthBarListView
+                    model: depthBarValues
+                    height: parent.height
+                    width: parent.width
+                    interactive: false
+
+                    Component.onCompleted: {
+                        let depth = -1 * _activeVehicle.altitudeRelative.rawValue.toFixed(1);
+                        depthBarListView.positionViewAtIndex(depthBarItem.initialYOffset + (depth-5) * 5, ListView.Beginning)
+                    }
+
+                    Connections{
+                        target: _activeVehicle.altitudeRelative
+                        onValueChanged: {
+                            let depth = -1 * _activeVehicle.altitudeRelative.rawValue.toFixed(1);
+                            if (depth >= 5){
+                                depthBarListView.positionViewAtIndex((depth-5) * 5, ListView.Beginning)
+                                return;
+                            }
+                            depthBarListView.positionViewAtIndex(0, ListView.Beginning);
+                        }
+                    }
+
+                    delegate: Item{
+                        // color: model.index % 2 == 0 ? "red" : "blue"
+                        height: depthBarItem.depthBarToothHeight
+                        width: depthBarColumn.width
+
+                        Item{
+                            // color: "green"
+                            anchors{
+                                right: parent.right
+                                verticalCenter: parent.top
+                            }
+                            width: parent.width * 0.75
+                            Text{
+                                // anchors.centerIn: parent
+                                anchors{
+                                    verticalCenter: parent.verticalCenter
+                                    left: parent.left
+                                    leftMargin: _toolIndicatorMargins * 2
+                                }
+
+                                font.pointSize: ScreenTools.defaultFontPointSize
+                                font.bold: true
+                                color: "white"
+                                text: {
+                                    switch (model.type){
+                                    case "long-line":
+                                        return `${model.index * 0.2}°`
+                                        // return `850°`
+                                    default:
+                                        return ``
+                                    }
+                                }
+                            }
+                        }
+
+
+                        Item{
+                            // color: "cyan"
+                            anchors{
+                                right: parent.children[0].left
+                                rightMargin: _toolIndicatorMargins * 0.25
+                                verticalCenter: parent.top
+                                left: parent.left
+                            }
+                            height: parent.height
+                            Rectangle{
+                                anchors.centerIn: parent
+                                height: 3
+                                width: {
+                                    switch (model.type){
+                                    case "long-line":
+                                        return parent.width
+                                    case "short-line":
+                                        return parent.width * 0.75
+                                    default:
+                                        return 0
+                                    }
+                                }
+                                color: "white"
+                            }
+                        }
+                    }
+                }
+            }
+
+            Item{
+                // color: "purple"
+                id: depthBarArrowItem
+                anchors{
+                    left: parent.left
+                }
+                height: parent.height * 0.8
+                width: parent.width - depthBarColumn.width - _toolIndicatorMargins
+                y: parent.height * 0.5 - height * 0.5
+
+                Item{
+                    // color: "green"
+                    height: depthBarItem.depthBarToothHeight * 5
+                    width: parent.width
+                    y: {
+                        let depth = -1 * _activeVehicle.altitudeRelative.rawValue.toFixed(1);
+                        if (depth <= 5 && depth >= 0){
+                            return (depth * depthBarItem.depthBarToothHeight * 5);
+                        }
+                        else if (depth >= 5){
+                            return depthBarItem.initialYOffset
+                        }
+                        return 0;
+                    }
+
+                    Image{
+                        id: depthBarArrowIcon
+                        anchors{
+                            right: parent.right
+                            rightMargin: _toolIndicatorMargins
+                            verticalCenter: parent.top
+                        }
+                        height: parent.height
+                        rotation: 90
+                        source: "/qmlimages/vehicleArrowOpaque.svg"
+                        fillMode: Image.PreserveAspectFit
+                    }
+                    Text{
+                        anchors{
+                            right: depthBarArrowIcon.left
+                            rightMargin: _toolIndicatorMargins
+                            verticalCenter: parent.top
+                        }
+                        text: `${_activeVehicle.altitudeRelative.rawValue.toFixed(1)}M`
+                        color: "white"
+                        font.pointSize: ScreenTools.defaultFontPointSize * 1.5
+                        font.bold: true
+                    }
+                }
+            }
+        }
+    }
+
+
+    Loader{
+        id: rollIconComponentLoader
+        anchors.centerIn: parent
+        height: _root.height * 0.5
+        width: height
+        sourceComponent: (_activeVehicle.loadCustomAddedLentaComponents) ? rollIconBarComponent : null
+    }
+
+    Component{
+        id: rollIconBarComponent
+
+        //Cross hair item
+        Item{
+            // color: "green"
             anchors.fill: parent
 
-            function pitchBarOffset(pitchVal){
-                return pitchVal * 30;
-            }
-
-            function depthBarOffset(depthVal){
-
-                if(depthVal < -5){
-                    return (depthVal * 30) + 150;
-                }
-
-                return 0;
-            }
-
-            function depthBarArrowOffset(depthVal){
-                if(depthVal >= -5){
-                    return -depthVal * 30;
-                }
-
-                return 150;
-            }
-
-
-            function crossHairAngle(rollVal){
-                return rollVal;
-            }
-
-            //Pitch bar item
             Item{
-                id: clipItem
-                anchors.left: parent.left
-                height: parent.height
-                width: 150
-                clip: true
-
-
-                Image{
-                    id: leftSidePitchBar
-
-                    source: "/qmlimages/pitchBar.svg"
-                    anchors.verticalCenter: _root.verticalCenter
-                    fillMode: Image.Pad
-                    smooth: true
-                    y: -2450
-                    transform: Translate{
-                        y: mainBars.pitchBarOffset(_activeVehicle.pitch.rawValue.toFixed(1))
-                    }
-
-                }
-
-            }
-
-            //Pitch bar top horizon line
-            Rectangle{
-                width: 45
-                height: 5
-                color: "#00FF38"
-                anchors.bottom: clipItem.top
-                anchors.horizontalCenter: clipItem.horizontalCenter
-                z: 3
-                visible: _activeVehicle.pitch.rawValue.toFixed(1) <= -10
-
-            }
-
-            //Pitch bar bottom horizon line
-            Rectangle{
-                width: 45
-                height: 5
-                color: "#00FF38"
-                anchors.top: clipItem.bottom
-                anchors.horizontalCenter: clipItem.horizontalCenter
-                z: 3
-                visible: _activeVehicle.pitch.rawValue.toFixed(1) >= 10.5
-            }
-
-
-            //Pitch bar arrow
-            Item{
-                id: pitchBarArrow
-                width: 70
-                height: 100
-                anchors.horizontalCenter: clipItem.right
-                anchors.verticalCenter: clipItem.verticalCenter
-                anchors.verticalCenterOffset: 5
-                Item{
-                    height: 35
-                    width: 35
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.horizontalCenter: parent.horizontalCenter
-
-                    Image{
-                        source: "/qmlimages/vehicleArrowOpaque.svg"
-                        anchors.fill: parent
-                        transform: Rotation{
-                            angle: 270
-
-                        }
-                    }
-
-
-
-
-                }
-                Text{
-                    anchors.bottom: parent.top
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    font.pixelSize: 25
-                    color: "white"
-                    text: `${_activeVehicle.pitch.rawValue.toFixed(1)}°`
-                    font.family:    ScreenTools.normalFontFamily
-                }
-
-            }
-
-
-            //Depth bar item
-            Item{
-                id: clipItemDepthBar
-                anchors.right: parent.right
-                height: parent.height
-                width: 150
-                clip: true
-
-
-                Image{
-
-                    source: "/qmlimages/depthBar.svg"
-                    anchors.verticalCenter: _root.verticalCenter
-                    fillMode: Image.Pad
-                    smooth: true
-                    transform: Translate{
-                        y: mainBars.depthBarOffset(_activeVehicle.altitudeRelative.rawValue.toFixed(1))
-                    }
-
-                }
-
-            }
-
-            //Depth bar arrow
-            Item{
-                id: depthBarArrow
-                width: 70
-                height: 100
-                anchors.horizontalCenter: clipItemDepthBar.left
-                anchors.verticalCenter: clipItemDepthBar.top
-                Item{
-                    id: depthBarArrowMovable
-
-                    height: 35
-                    width: 35
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.verticalCenterOffset: 30
-                    transform: Translate{
-                        y: mainBars.depthBarArrowOffset(_activeVehicle.altitudeRelative.rawValue.toFixed(1))
-                    }
-                    Image{
-                        source: "/qmlimages/vehicleArrowOpaque.svg"
-                        anchors.fill: parent
-                        transform: Rotation{
-                            angle: 90
-                        }
-                    }
-
-                }
-
-                Text{
-                    anchors.bottom: depthBarArrowMovable.top
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.horizontalCenterOffset: -5
-                    anchors.verticalCenterOffset: -5
-                    font.pixelSize: 25
-                    color: "white"
-                    text: `${_activeVehicle.altitudeRelative.rawValue.toFixed(1)}M`
-                    font.family:    ScreenTools.normalFontFamily
-
-                    transform: Translate{
-                        y: mainBars.depthBarArrowOffset(_activeVehicle.altitudeRelative.rawValue.toFixed(1))
-                    }
-                }
-            }
-
-            //Cross hair item
-            Item{
+                // color: "blue"
                 id: crossHairItem
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
-                height: 100
-                width: 100
+                anchors.centerIn: parent
+                width: parent.width * 0.2
+                height: width
 
                 Image{
                     id: crossHairIcon
                     source: "/qmlimages/lentaCrossHair.svg"
-                    anchors.verticalCenter:parent.verticalCenter
-                    anchors.horizontalCenter: _root.horizontalCenter
-                    fillMode: Image.Pad
+                    anchors.centerIn: parent
+                    anchors.fill: parent
+                    fillMode: Image.PreserveAspectFit
                     smooth: true
                     transform: Rotation{
-                        angle: mainBars.crossHairAngle(_activeVehicle.roll.rawValue.toFixed(1))
-                        origin.x: crossHairIcon.width/2
-                        origin.y: crossHairIcon.height/2
+                        angle: _activeVehicle.roll.rawValue.toFixed(1)
+                        origin.x: crossHairIcon.width * 0.5
+                        origin.y: crossHairIcon.height * 0.5
                     }
-
                 }
-            }
 
-            //Cross hair roll value
-            Item{
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.horizontalCenterOffset: -110
-                anchors.verticalCenterOffset: -25
                 Text{
-                    font.pixelSize: 25
+                    anchors{
+                        left: crossHairIcon.right
+                        leftMargin: ScreenTools.defaultFontPointSize
+                        verticalCenter: parent.verticalCenter
+                    }
+                    font.pointSize: ScreenTools.defaultFontPointSize * 1.5
+                    font.family:    ScreenTools.normalFontFamily
+                    font.bold: true
                     color: "white"
                     text: `${_activeVehicle.roll.rawValue.toFixed(1)}°`
-                    font.family:    ScreenTools.normalFontFamily
                 }
+
             }
-
-
-
         }
+
     }
 
 
     Loader{
         id: miniValuesBarLoader
-        width: 50
-        height: _root.height * 0.57
+        width: _root.width * 0.035
+        // height: _root.height * 0.5
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: 5
         anchors.left: parent.left
-        anchors.leftMargin: 6
+        anchors.leftMargin: width * 0.15
         sourceComponent: (_activeVehicle.loadCustomAddedLentaComponents) ? miniValuesBar : null
     }
 
     Component{
         id: miniValuesBar
-        Rectangle{
-            anchors.fill: parent
-            color: "#80000000"
 
-            Column{
-                id: valueBarPrimary
-                anchors.fill: parent
-                spacing: ScreenTools.defaultFontPixelWidth
+        Column{
+            id: valueBarPrimary
+            // anchors.fill: parent
+            width: parent.width
+            spacing: ScreenTools.defaultFontPixelWidth
 
-                FactPanelController { id: controller; }
+            FactPanelController { id: controller; }
 
-                property var  _activeVehicle:           QGroundControl.multiVehicleManager.activeVehicle
-                property real _toolIndicatorMargins:    ScreenTools.defaultFontPixelHeight * 0.66
+            property var  _activeVehicle:           QGroundControl.multiVehicleManager.activeVehicle
+            property real _toolIndicatorMargins:    ScreenTools.defaultFontPixelHeight * 0.66
 
-                property Fact lightsOne: controller.vehicle.getFact("apmSubInfo.lights1")
-                property Fact lightsTwo: controller.vehicle.getFact("apmSubInfo.lights2")
-                property Fact heading_hold_toggle: controller.getParameterFact(-1, "HEADING_HOLD_TOG")
-                property Fact heading_hold_toggle_exists: controller.parameterExists(-1, "HEADING_HOLD_TOG")
+            property Fact lightsOne: controller.vehicle.getFact("apmSubInfo.lights1")
+            property Fact lightsTwo: controller.vehicle.getFact("apmSubInfo.lights2")
 
-                property Fact altitude_hold_toggle: controller.getParameterFact(-1, "ALTITUDE_HOLD_TO")
-                property Fact altitude_hold_toggle_exists: controller.parameterExists(-1, "ALTITUDE_HOLD_TO")
+            property Fact flightTime: controller.vehicle.getFact("FlightTime")
+            property Fact temperatureTwo: controller.vehicle.getFact("temperature.temperature2")
 
-                property Fact flightTime: controller.vehicle.getFact("FlightTime")
-                property Fact temperatureTwo: controller.vehicle.getFact("temperature.temperature2")
+            property Fact cameraTilt: controller.vehicle.getFact("apmSubInfo.cameraTilt")
 
-                property Fact cameraTilt: controller.vehicle.getFact("apmSubInfo.cameraTilt")
-
-                property Fact pilotGain: controller.vehicle.getFact("apmSubInfo.pilotGain")
-                property Fact tetherTurns: controller.vehicle.getFact("apmSubInfo.tetherTurns")
-                property Fact inputHold: controller.vehicle.getFact("apmSubInfo.inputHold")
-
-                property Fact recordToggle: controller.getParameterFact(-1, "RECORDING_TOGGLE")
+            property Fact pilotGain: controller.vehicle.getFact("apmSubInfo.pilotGain")
+            property Fact tetherTurns: controller.vehicle.getFact("apmSubInfo.tetherTurns")
+            property Fact inputHold: controller.vehicle.getFact("apmSubInfo.inputHold")
 
 
 
-                property real itemSize: miniValuesBarLoader.width * 0.20
-                property real valueSize: (itemSize * 0.15)
-                property real titleSize: valueSize + 5
 
-                property real itemHeight: 50
+            property real itemSize: miniValuesBarLoader.width * 0.20
+            property real valueSize: (itemSize * 0.15)
+            property real titleSize: valueSize + 5
 
-                function getTitleSize(){
-                    return miniValuesBarLoader.width * 0.01
-                }
+            property real itemHeight: _root.height * 0.075
+
+            function getTitleSize(){
+                return miniValuesBarLoader.width * 0.01
+            }
+
+            //Joystick stat
+            Item{
+                width: parent.width
+                height: valueBarPrimary.itemHeight
+               Text{
+                   id: joystickLabel
+                   font.bold: true
+                   color: "white";
+                   text: "JoyStick";
+                   anchors.horizontalCenter: parent.horizontalCenter;
+                   anchors.top: parent.top;
+                   font.family:    ScreenTools.normalFontFamily
+                   font.pointSize:     ScreenTools.defaultFontPointSize * 1
+               }
 
 
-                function altHldValue(){
-
-                }
-                function distHldValue(){
-
-                }
-
-                function getInputHoldColor(val){
-                    return (val === 1) ? "#00ff55" : "#FF0000";
-                }
-
-                function getHdgToggleValue(){
-                    return (valueBarPrimary.heading_hold_toggle.value === 1) ? "ACTIVE" : "NOT ACTIVE";
-                }
-
-                function getHdgToggleColor(){
-                    if(!valueBarPrimary.heading_hold_toggle_exists){
-                        return "#FF0000";
+                Loader {
+                    anchors{
+                        // bottom:     parent.bottom
+                        top: joystickLabel.top
+                        topMargin: height * 0.35
+                        horizontalCenter: parent.horizontalCenter
                     }
-                    if (valueBarPrimary.heading_hold_toggle.value === 1){
-                        _activeVehicle.sayHdgHoldState(true);
-                        return "#00ff55";
-                    }
-                    _activeVehicle.sayHdgHoldState(false);
-                    return "#FF0000";
+                    height: parent.height * 0.5
 
+
+
+                    source:             "qrc:/toolbar/JoystickIndicator.qml"
+                    visible:            item.showIndicator
                 }
+            }
 
-                function getAltToggleColor(){
-                    if(!valueBarPrimary.altitude_hold_toggle_exists){
-                        return "#FF0000";
-                    }
-                    if (valueBarPrimary.altitude_hold_toggle.value === 1){
-                        _activeVehicle.sayAltHoldState(true);
-                        return "#00ff55";
-                    }
-                    _activeVehicle.sayAltHoldState(false);
-                    return "#FF0000";
-
-                }
-
-                //hdg hold
-                Item{
-                    width: parent.width
-                    height: valueBarPrimary.itemHeight
+            //Video record
+            Item{
+                id: videoRecordToggle
 
 
-                    Text {
-                        id: hdgHoldFirstValText
-                        font.pixelSize: 8
-                        font.bold: true
-                        text: qsTr("HEADING")
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.top: parent.top
-                        color: "white"
-                        font.family:    ScreenTools.normalFontFamily
+                // The following properties relate to a simple camera
+                property var    _flyViewSettings:                           QGroundControl.settingsManager.flyViewSettings
+                property bool   _simpleCameraAvailable:                     !_mavlinkCamera && _activeVehicle && _flyViewSettings.showSimpleCameraControl.rawValue
+                property bool   _onlySimpleCameraAvailable:                 !_anyVideoStreamAvailable && _simpleCameraAvailable
+                property bool   _simpleCameraIsShootingInCurrentMode:       _onlySimpleCameraAvailable && !_simplePhotoCaptureIsIdle
 
-                    }
-                    Text{
-                        id: hdgHoldSecondValText
-                        font.pixelSize: 8
-                        font.bold: true
-                        text: qsTr("HOLD")
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.top: hdgHoldFirstValText.bottom
-                        color: "white"
-                        font.family:    ScreenTools.normalFontFamily
+                // The following properties relate to a simple video stream
+                property bool   _videoStreamAvailable:                      _videoStreamManager.hasVideo
+                property var    _videoStreamSettings:                       QGroundControl.settingsManager.videoSettings
+                property var    _videoStreamManager:                        QGroundControl.videoManager
+                property bool   _videoStreamAllowsPhotoWhileRecording:      true
+                property bool   _videoStreamIsStreaming:                    _videoStreamManager.streaming
+                property bool   _simplePhotoCaptureIsIdle:             true
+                property bool   _videoStreamRecording:                      _videoStreamManager.recording
+                property bool   _videoStreamCanShoot:                       _videoStreamIsStreaming
+                property bool   _videoStreamIsShootingInCurrentMode:        _videoStreamInPhotoMode ? !_simplePhotoCaptureIsIdle : _videoStreamRecording
+                property bool   _videoStreamInPhotoMode:                    false
 
-                    }
+                // The following properties relate to a mavlink protocol camera
+                property var    _mavlinkCameraManager:                      _activeVehicle ? _activeVehicle.cameraManager : null
+                property int    _mavlinkCameraManagerCurCameraIndex:        _mavlinkCameraManager ? _mavlinkCameraManager.currentCamera : -1
+                property bool   _noMavlinkCameras:                          _mavlinkCameraManager ? _mavlinkCameraManager.cameras.count === 0 : true
+                property var    _mavlinkCamera:                             !_noMavlinkCameras ? (_mavlinkCameraManager.cameras.get(_mavlinkCameraManagerCurCameraIndex) && _mavlinkCameraManager.cameras.get(_mavlinkCameraManagerCurCameraIndex).paramComplete ? _mavlinkCameraManager.cameras.get(_mavlinkCameraManagerCurCameraIndex) : null) : null
+                property bool   _multipleMavlinkCameras:                    _mavlinkCameraManager ? _mavlinkCameraManager.cameras.count > 1 : false
+                property string _mavlinkCameraName:                         _mavlinkCamera && _multipleMavlinkCameras ? _mavlinkCamera.modelName : ""
+                property bool   _noMavlinkCameraStreams:                    _mavlinkCamera ? _mavlinkCamera.streamLabels.length : true
+                property bool   _multipleMavlinkCameraStreams:              _mavlinkCamera ? _mavlinkCamera.streamLabels.length > 1 : false
+                property int    _mavlinCameraCurStreamIndex:                _mavlinkCamera ? _mavlinkCamera.currentStream : -1
+                property bool   _mavlinkCameraHasThermalVideoStream:        _mavlinkCamera ? _mavlinkCamera.thermalStreamInstance : false
+                property bool   _mavlinkCameraModeUndefined:                _mavlinkCamera ? _mavlinkCamera.cameraMode === QGCCameraControl.CAM_MODE_UNDEFINED : true
+                property bool   _mavlinkCameraInVideoMode:                  _mavlinkCamera ? _mavlinkCamera.cameraMode === QGCCameraControl.CAM_MODE_VIDEO : false
+                property bool   _mavlinkCameraInPhotoMode:                  _mavlinkCamera ? _mavlinkCamera.cameraMode === QGCCameraControl.CAM_MODE_PHOTO : false
+                property bool   _mavlinkCameraElapsedMode:                  _mavlinkCamera && _mavlinkCamera.cameraMode === QGCCameraControl.CAM_MODE_PHOTO && _mavlinkCamera.photoMode === QGCCameraControl.PHOTO_CAPTURE_TIMELAPSE
+                property bool   _mavlinkCameraHasModes:                     _mavlinkCamera && _mavlinkCamera.hasModes
+                property bool   _mavlinkCameraVideoIsRecording:             _mavlinkCamera && _mavlinkCamera.videoStatus === QGCCameraControl.VIDEO_CAPTURE_STATUS_RUNNING
+                property bool   _mavlinkCameraPhotoCaptureIsIdle:           _mavlinkCamera && (_mavlinkCamera.photoStatus === QGCCameraControl.PHOTO_CAPTURE_IDLE || _mavlinkCamera.photoStatus >= QGCCameraControl.PHOTO_CAPTURE_LAST)
+                property bool   _mavlinkCameraStorageReady:                 _mavlinkCamera && _mavlinkCamera.storageStatus === QGCCameraControl.STORAGE_READY
+                property bool   _mavlinkCameraBatteryReady:                 _mavlinkCamera && _mavlinkCamera.batteryRemaining >= 0
+                property bool   _mavlinkCameraStorageSupported:             _mavlinkCamera && _mavlinkCamera.storageStatus !== QGCCameraControl.STORAGE_NOT_SUPPORTED
+                property bool   _mavlinkCameraAllowsPhotoWhileRecording:    false
+                property bool   _mavlinkCameraCanShoot:                     (!_mavlinkCameraModeUndefined && ((_mavlinkCameraStorageReady && _mavlinkCamera.storageFree > 0) || !_mavlinkCameraStorageSupported)) || _videoStreamManager.streaming
+                property bool   _mavlinkCameraIsShooting:                   ((_mavlinkCameraInVideoMode && _mavlinkCameraVideoIsRecording) || (_mavlinkCameraInPhotoMode && !_mavlinkCameraPhotoCaptureIsIdle)) || _videoStreamManager.recording
 
-                    Rectangle{
-                        width: 15
-                        height: 15
-                        radius: 15
-                        color: valueBarPrimary.getHdgToggleColor()
-                        opacity: 1
-                        anchors.top: hdgHoldSecondValText.bottom
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.topMargin: 5
-                    }
+                // The following settings and functions unify between a mavlink camera and a simple video stream for simple access
 
-                }
+                property bool   _anyVideoStreamAvailable:                   _videoStreamManager.hasVideo
+                property string _cameraName:                                _mavlinkCamera ? _mavlinkCameraName : ""
+                property bool   _showModeIndicator:                         _mavlinkCamera ? _mavlinkCameraHasModes : _videoStreamManager.hasVideo
+                property bool   _modeIndicatorPhotoMode:                    _mavlinkCamera ? _mavlinkCameraInPhotoMode : _videoStreamInPhotoMode || _onlySimpleCameraAvailable
+                property bool   _allowsPhotoWhileRecording:                  _mavlinkCamera ? _mavlinkCameraAllowsPhotoWhileRecording : _videoStreamAllowsPhotoWhileRecording
+                property bool   _switchToPhotoModeAllowed:                  !_modeIndicatorPhotoMode && (_mavlinkCamera ? !_mavlinkCameraIsShooting : true)
+                property bool   _switchToVideoModeAllowed:                  _modeIndicatorPhotoMode && (_mavlinkCamera ? !_mavlinkCameraIsShooting : true)
+                property bool   _videoIsRecording:                          _mavlinkCamera ? _mavlinkCameraIsShooting : _videoStreamRecording
+                property bool   _canShootInCurrentMode:                     _mavlinkCamera ? _mavlinkCameraCanShoot : _videoStreamCanShoot || _simpleCameraAvailable
+                property bool   _isShootingInCurrentMode:                   _mavlinkCamera ? _mavlinkCameraIsShooting : _videoStreamIsShootingInCurrentMode || _simpleCameraIsShootingInCurrentMode
 
-                Rectangle{
-                    width: parent.width
-                    height: 1
-                    color: "white"
-                    anchors.right: parent.right
-                }
-
-                //alt hold
-                Item{
-                    width: parent.width
-                    height: valueBarPrimary.itemHeight
-
-                    Text {
-                        id: altHoldFirstValueText
-                        font.pixelSize: 8
-                        font.bold: true
-                        text: qsTr("ALTITUDE")
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.top: parent.top
-                        color: "white"
-                        font.family:    ScreenTools.normalFontFamily
-                    }
-
-
-                    Text{
-                        id: altHoldSecondValueText
-                        font.pixelSize: 8
-                        font.bold: true
-                        text: qsTr("HOLD")
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.top: altHoldFirstValueText.bottom
-                        color: "white"
-                        font.family:    ScreenTools.normalFontFamily
-                    }
-
-                    Rectangle{
-                        width: 15
-                        height: 15
-                        radius: 15
-                        color: valueBarPrimary.getAltToggleColor()
-                        opacity: 1
-                        anchors.top: altHoldSecondValueText.bottom
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.topMargin: 5
-                    }
-
-                }
-
-                Rectangle{
-                    width: parent.width
-                    height: 1
-                    color: "white"
-                    anchors.right: parent.right
-                }
-
-
-                //dist hold
-                Item{
-                    width: parent.width
-                    height: valueBarPrimary.itemHeight
-
-                    Text {
-                        id: distHoldFirstValueText
-                        font.pixelSize: 8
-                        font.bold: true
-                        text: qsTr("DISTANCE")
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.top: parent.top
-                        color: "white"
-                        font.family:    ScreenTools.normalFontFamily
-                    }
-
-                    Text{
-                        id: distHoldSecondValueText
-                        font.pixelSize: 8
-                        font.bold: true
-                        text: qsTr("HOLD")
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.top: distHoldFirstValueText.bottom
-                        color: "white"
-                        font.family:    ScreenTools.normalFontFamily
-                    }
-
-                    Rectangle{
-                        width: 15
-                        height: 15
-                        radius: 15
-                        color: "#ff0000"
-                        opacity: 1
-                        anchors.top: distHoldSecondValueText.bottom
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.topMargin: 5
-                    }
-
-                }
-
-                Rectangle{
-                    width: parent.width
-                    height: 1
-                    color: "white"
-                    anchors.right: parent.right
-                }
-
-
-                //Input hold
-                Item{
-                    width: parent.width
-                    height: valueBarPrimary.itemHeight
-
-                    Text {
-                        id: inputHoldFirstValueText
-                        font.pixelSize: 8
-                        font.bold: true
-                        text: qsTr("INPUT")
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.top: parent.top
-                        color: "white"
-                        font.family:    ScreenTools.normalFontFamily
-                    }
-
-                    Text{
-                        id: inputHoldSecondValueText
-                        font.pixelSize: 8
-                        font.bold: true
-                        text: qsTr("HOLD")
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.top: inputHoldFirstValueText.bottom
-                        color: "white"
-                        font.family:    ScreenTools.normalFontFamily
-                    }
-
-                    Rectangle{
-                        width: 15
-                        height: 15
-                        radius: 15
-                        color: valueBarPrimary.getInputHoldColor(valueBarPrimary.inputHold.value)
-                        opacity: 1
-                        anchors.top: inputHoldSecondValueText.bottom
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.topMargin: 5
-                    }
-
-
-                }
-
-
-                Rectangle{
-                    width: parent.width
-                    height: 1
-                    color: "white"
-                    anchors.right: parent.right
-                }
-
-
-                //Joystick stat
-                Item{
-                    width: parent.width
-                    height: valueBarPrimary.itemHeight
-                   Text{
-                       id: joystickLabel
-                       font.pixelSize: 8;
-                       font.bold: true
-                       color: "white";
-                       text: "JOYSTICK";
-                       anchors.horizontalCenter: parent.horizontalCenter;
-                       anchors.top: parent.top;
-                       anchors.topMargin: 3
-                       font.family:    ScreenTools.normalFontFamily
-                   }
-
-
-                    Loader {
-                        anchors.bottom:     parent.bottom
-                        anchors.top: joystickLabel.top
-                        anchors.topMargin: 15
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        source:             "qrc:/toolbar/JoystickIndicator.qml"
-                        visible:            item.showIndicator
-                    }
-                }
-
-
-                Rectangle{
-                    width: parent.width
-                    height: 1
-                    color: "white"
-                    anchors.right: parent.right
-                }
-
-                //Video record
-                Item{
-                    id: videoRecordToggle
-
-
-                    // The following properties relate to a simple camera
-                    property var    _flyViewSettings:                           QGroundControl.settingsManager.flyViewSettings
-                    property bool   _simpleCameraAvailable:                     !_mavlinkCamera && _activeVehicle && _flyViewSettings.showSimpleCameraControl.rawValue
-                    property bool   _onlySimpleCameraAvailable:                 !_anyVideoStreamAvailable && _simpleCameraAvailable
-                    property bool   _simpleCameraIsShootingInCurrentMode:       _onlySimpleCameraAvailable && !_simplePhotoCaptureIsIdle
-
-                    // The following properties relate to a simple video stream
-                    property bool   _videoStreamAvailable:                      _videoStreamManager.hasVideo
-                    property var    _videoStreamSettings:                       QGroundControl.settingsManager.videoSettings
-                    property var    _videoStreamManager:                        QGroundControl.videoManager
-                    property bool   _videoStreamAllowsPhotoWhileRecording:      true
-                    property bool   _videoStreamIsStreaming:                    _videoStreamManager.streaming
-                    property bool   _simplePhotoCaptureIsIdle:             true
-                    property bool   _videoStreamRecording:                      _videoStreamManager.recording
-                    property bool   _videoStreamCanShoot:                       _videoStreamIsStreaming
-                    property bool   _videoStreamIsShootingInCurrentMode:        _videoStreamInPhotoMode ? !_simplePhotoCaptureIsIdle : _videoStreamRecording
-                    property bool   _videoStreamInPhotoMode:                    false
-
-                    // The following properties relate to a mavlink protocol camera
-                    property var    _mavlinkCameraManager:                      _activeVehicle ? _activeVehicle.cameraManager : null
-                    property int    _mavlinkCameraManagerCurCameraIndex:        _mavlinkCameraManager ? _mavlinkCameraManager.currentCamera : -1
-                    property bool   _noMavlinkCameras:                          _mavlinkCameraManager ? _mavlinkCameraManager.cameras.count === 0 : true
-                    property var    _mavlinkCamera:                             !_noMavlinkCameras ? (_mavlinkCameraManager.cameras.get(_mavlinkCameraManagerCurCameraIndex) && _mavlinkCameraManager.cameras.get(_mavlinkCameraManagerCurCameraIndex).paramComplete ? _mavlinkCameraManager.cameras.get(_mavlinkCameraManagerCurCameraIndex) : null) : null
-                    property bool   _multipleMavlinkCameras:                    _mavlinkCameraManager ? _mavlinkCameraManager.cameras.count > 1 : false
-                    property string _mavlinkCameraName:                         _mavlinkCamera && _multipleMavlinkCameras ? _mavlinkCamera.modelName : ""
-                    property bool   _noMavlinkCameraStreams:                    _mavlinkCamera ? _mavlinkCamera.streamLabels.length : true
-                    property bool   _multipleMavlinkCameraStreams:              _mavlinkCamera ? _mavlinkCamera.streamLabels.length > 1 : false
-                    property int    _mavlinCameraCurStreamIndex:                _mavlinkCamera ? _mavlinkCamera.currentStream : -1
-                    property bool   _mavlinkCameraHasThermalVideoStream:        _mavlinkCamera ? _mavlinkCamera.thermalStreamInstance : false
-                    property bool   _mavlinkCameraModeUndefined:                _mavlinkCamera ? _mavlinkCamera.cameraMode === QGCCameraControl.CAM_MODE_UNDEFINED : true
-                    property bool   _mavlinkCameraInVideoMode:                  _mavlinkCamera ? _mavlinkCamera.cameraMode === QGCCameraControl.CAM_MODE_VIDEO : false
-                    property bool   _mavlinkCameraInPhotoMode:                  _mavlinkCamera ? _mavlinkCamera.cameraMode === QGCCameraControl.CAM_MODE_PHOTO : false
-                    property bool   _mavlinkCameraElapsedMode:                  _mavlinkCamera && _mavlinkCamera.cameraMode === QGCCameraControl.CAM_MODE_PHOTO && _mavlinkCamera.photoMode === QGCCameraControl.PHOTO_CAPTURE_TIMELAPSE
-                    property bool   _mavlinkCameraHasModes:                     _mavlinkCamera && _mavlinkCamera.hasModes
-                    property bool   _mavlinkCameraVideoIsRecording:             _mavlinkCamera && _mavlinkCamera.videoStatus === QGCCameraControl.VIDEO_CAPTURE_STATUS_RUNNING
-                    property bool   _mavlinkCameraPhotoCaptureIsIdle:           _mavlinkCamera && (_mavlinkCamera.photoStatus === QGCCameraControl.PHOTO_CAPTURE_IDLE || _mavlinkCamera.photoStatus >= QGCCameraControl.PHOTO_CAPTURE_LAST)
-                    property bool   _mavlinkCameraStorageReady:                 _mavlinkCamera && _mavlinkCamera.storageStatus === QGCCameraControl.STORAGE_READY
-                    property bool   _mavlinkCameraBatteryReady:                 _mavlinkCamera && _mavlinkCamera.batteryRemaining >= 0
-                    property bool   _mavlinkCameraStorageSupported:             _mavlinkCamera && _mavlinkCamera.storageStatus !== QGCCameraControl.STORAGE_NOT_SUPPORTED
-                    property bool   _mavlinkCameraAllowsPhotoWhileRecording:    false
-                    property bool   _mavlinkCameraCanShoot:                     (!_mavlinkCameraModeUndefined && ((_mavlinkCameraStorageReady && _mavlinkCamera.storageFree > 0) || !_mavlinkCameraStorageSupported)) || _videoStreamManager.streaming
-                    property bool   _mavlinkCameraIsShooting:                   ((_mavlinkCameraInVideoMode && _mavlinkCameraVideoIsRecording) || (_mavlinkCameraInPhotoMode && !_mavlinkCameraPhotoCaptureIsIdle)) || _videoStreamManager.recording
-
-                    // The following settings and functions unify between a mavlink camera and a simple video stream for simple access
-
-                    property bool   _anyVideoStreamAvailable:                   _videoStreamManager.hasVideo
-                    property string _cameraName:                                _mavlinkCamera ? _mavlinkCameraName : ""
-                    property bool   _showModeIndicator:                         _mavlinkCamera ? _mavlinkCameraHasModes : _videoStreamManager.hasVideo
-                    property bool   _modeIndicatorPhotoMode:                    _mavlinkCamera ? _mavlinkCameraInPhotoMode : _videoStreamInPhotoMode || _onlySimpleCameraAvailable
-                    property bool   _allowsPhotoWhileRecording:                  _mavlinkCamera ? _mavlinkCameraAllowsPhotoWhileRecording : _videoStreamAllowsPhotoWhileRecording
-                    property bool   _switchToPhotoModeAllowed:                  !_modeIndicatorPhotoMode && (_mavlinkCamera ? !_mavlinkCameraIsShooting : true)
-                    property bool   _switchToVideoModeAllowed:                  _modeIndicatorPhotoMode && (_mavlinkCamera ? !_mavlinkCameraIsShooting : true)
-                    property bool   _videoIsRecording:                          _mavlinkCamera ? _mavlinkCameraIsShooting : _videoStreamRecording
-                    property bool   _canShootInCurrentMode:                     _mavlinkCamera ? _mavlinkCameraCanShoot : _videoStreamCanShoot || _simpleCameraAvailable
-                    property bool   _isShootingInCurrentMode:                   _mavlinkCamera ? _mavlinkCameraIsShooting : _videoStreamIsShootingInCurrentMode || _simpleCameraIsShootingInCurrentMode
-
-                    function toggleShooting() {
-                        if (_mavlinkCamera && _mavlinkCamera.capturesVideo) {
-                            if(_mavlinkCameraInVideoMode) {
-                                _mavlinkCamera.toggleVideo()
+                function toggleShooting() {
+                    if (_mavlinkCamera && _mavlinkCamera.capturesVideo) {
+                        if(_mavlinkCameraInVideoMode) {
+                            _mavlinkCamera.toggleVideo()
+                        } else {
+                            if(_mavlinkCameraInPhotoMode && !_mavlinkCameraPhotoCaptureIsIdle && _mavlinkCameraElapsedMode) {
+                                _mavlinkCamera.stopTakePhoto()
                             } else {
-                                if(_mavlinkCameraInPhotoMode && !_mavlinkCameraPhotoCaptureIsIdle && _mavlinkCameraElapsedMode) {
-                                    _mavlinkCamera.stopTakePhoto()
-                                } else {
-                                    _mavlinkCamera.takePhoto()
-                                }
+                                _mavlinkCamera.takePhoto()
                             }
-                        } else if (_anyVideoStreamAvailable) {
-                            if (_videoStreamInPhotoMode) {
-                                _simplePhotoCaptureIsIdle = false
-                                _videoStreamManager.grabImage()
-                                simplePhotoCaptureTimer.start()
+                        }
+                    } else if (_anyVideoStreamAvailable) {
+                        if (_videoStreamInPhotoMode) {
+                            _simplePhotoCaptureIsIdle = false
+                            _videoStreamManager.grabImage()
+                            simplePhotoCaptureTimer.start()
+                        } else {
+                            if (_videoStreamManager.recording) {
+                                _videoStreamManager.stopRecording()
                             } else {
-                                if (_videoStreamManager.recording) {
-                                    _videoStreamManager.stopRecording()
-                                } else {
-                                    _videoStreamManager.startRecording()
-                                }
+                                _videoStreamManager.startRecording()
                             }
                         }
                     }
-                    width: parent.width
-                    height: valueBarPrimary.itemHeight *1.5
+                }
+                width: parent.width
+                height: valueBarPrimary.itemHeight * 1.5
 
-                    Text {
-                        id: video_rec_text
-                        text: qsTr("VIDEO REC")
-                        font.pixelSize: 8;
-                        font.bold: true
-
-                        color: "white";
-                        anchors.horizontalCenter: parent.horizontalCenter;
-                        anchors.top: parent.top;
-                        anchors.topMargin: 3
-                        font.family:    ScreenTools.normalFontFamily
-
-                    }
-                    Rectangle {
-                        Layout.alignment:   Qt.AlignHCenter
-                        anchors.top: video_rec_text.bottom
-                        anchors.topMargin: 7
-                        color:              Qt.rgba(0,0,0,0)
-                        width: parent.width
-                        height:             width
-                        radius:             width * 0.5
-                        border.color:       qgcPal.buttonText
-                        border.width:       3
-
-                        Rectangle {
-                            anchors.centerIn:   parent
-                            width:              parent.width * (videoRecordToggle._isShootingInCurrentMode ? 0.5 : 0.75)
-                            height:             width
-                            radius:             videoRecordToggle._isShootingInCurrentMode ? 0 : width * 0.5
-                            color:              videoRecordToggle._canShootInCurrentMode ? qgcPal.colorRed : qgcPal.colorGrey
-                        }
-
-                        MouseArea {
-                            anchors.fill:   parent
-                            enabled:        videoRecordToggle._canShootInCurrentMode
-                            onClicked:      videoRecordToggle.toggleShooting()
-                        }
-                    }
-
+                Text {
+                    id: video_rec_text
+                    text: qsTr("Video Rec")
+                    font.bold: true
+                    color: "white";
+                    anchors.horizontalCenter: parent.horizontalCenter;
+                    anchors.top: parent.top;
+                    anchors.topMargin: 3
+                    font.family:    ScreenTools.normalFontFamily
+                    font.pointSize:     ScreenTools.defaultFontPointSize * 1
 
                 }
-
-                Rectangle{
-                    width: parent.width
-                    height: 1
-                    color: "white"
-                    anchors.right: parent.right
-                }
-
-                //Video Photo capture
-                Item{
-                    id: videoPhotoToggle
-
-
-
-                    // The following properties relate to a simple camera
-                    property var    _flyViewSettings:                           QGroundControl.settingsManager.flyViewSettings
-                    property bool   _simpleCameraAvailable:                     !_mavlinkCamera && _activeVehicle && _flyViewSettings.showSimpleCameraControl.rawValue
-                    property bool   _onlySimpleCameraAvailable:                 !_anyVideoStreamAvailable && _simpleCameraAvailable
-                    property bool   _simpleCameraIsShootingInCurrentMode:       _onlySimpleCameraAvailable && !_simplePhotoCaptureIsIdle
-
-                    // The following properties relate to a simple video stream
-                    property bool   _videoStreamAvailable:                      _videoStreamManager.hasVideo
-                    property var    _videoStreamSettings:                       QGroundControl.settingsManager.videoSettings
-                    property var    _videoStreamManager:                        QGroundControl.videoManager
-                    property bool   _videoStreamAllowsPhotoWhileRecording:      true
-                    property bool   _videoStreamIsStreaming:                    _videoStreamManager.streaming
-                    property bool   _simplePhotoCaptureIsIdle:             true
-                    property bool   _videoStreamRecording:                      _videoStreamManager.recording
-                    property bool   _videoStreamCanShoot:                       _videoStreamIsStreaming
-                    property bool   _videoStreamIsShootingInCurrentMode:        _videoStreamInPhotoMode ? !_simplePhotoCaptureIsIdle : _videoStreamRecording
-                    property bool   _videoStreamInPhotoMode:                    true
-
-                    // The following properties relate to a mavlink protocol camera
-                    property var    _mavlinkCameraManager:                      _activeVehicle ? _activeVehicle.cameraManager : null
-                    property int    _mavlinkCameraManagerCurCameraIndex:        _mavlinkCameraManager ? _mavlinkCameraManager.currentCamera : -1
-                    property bool   _noMavlinkCameras:                          _mavlinkCameraManager ? _mavlinkCameraManager.cameras.count === 0 : true
-                    property var    _mavlinkCamera:                             !_noMavlinkCameras ? (_mavlinkCameraManager.cameras.get(_mavlinkCameraManagerCurCameraIndex) && _mavlinkCameraManager.cameras.get(_mavlinkCameraManagerCurCameraIndex).paramComplete ? _mavlinkCameraManager.cameras.get(_mavlinkCameraManagerCurCameraIndex) : null) : null
-                    property bool   _multipleMavlinkCameras:                    _mavlinkCameraManager ? _mavlinkCameraManager.cameras.count > 1 : false
-                    property string _mavlinkCameraName:                         _mavlinkCamera && _multipleMavlinkCameras ? _mavlinkCamera.modelName : ""
-                    property bool   _noMavlinkCameraStreams:                    _mavlinkCamera ? _mavlinkCamera.streamLabels.length : true
-                    property bool   _multipleMavlinkCameraStreams:              _mavlinkCamera ? _mavlinkCamera.streamLabels.length > 1 : false
-                    property int    _mavlinCameraCurStreamIndex:                _mavlinkCamera ? _mavlinkCamera.currentStream : -1
-                    property bool   _mavlinkCameraHasThermalVideoStream:        _mavlinkCamera ? _mavlinkCamera.thermalStreamInstance : false
-                    property bool   _mavlinkCameraModeUndefined:                _mavlinkCamera ? _mavlinkCamera.cameraMode === QGCCameraControl.CAM_MODE_UNDEFINED : true
-                    property bool   _mavlinkCameraInVideoMode:                  _mavlinkCamera ? _mavlinkCamera.cameraMode === QGCCameraControl.CAM_MODE_VIDEO : false
-                    property bool   _mavlinkCameraInPhotoMode:                  _mavlinkCamera ? _mavlinkCamera.cameraMode === QGCCameraControl.CAM_MODE_PHOTO : false
-                    property bool   _mavlinkCameraElapsedMode:                  _mavlinkCamera && _mavlinkCamera.cameraMode === QGCCameraControl.CAM_MODE_PHOTO && _mavlinkCamera.photoMode === QGCCameraControl.PHOTO_CAPTURE_TIMELAPSE
-                    property bool   _mavlinkCameraHasModes:                     _mavlinkCamera && _mavlinkCamera.hasModes
-                    property bool   _mavlinkCameraVideoIsRecording:             _mavlinkCamera && _mavlinkCamera.videoStatus === QGCCameraControl.VIDEO_CAPTURE_STATUS_RUNNING
-                    property bool   _mavlinkCameraPhotoCaptureIsIdle:           _mavlinkCamera && (_mavlinkCamera.photoStatus === QGCCameraControl.PHOTO_CAPTURE_IDLE || _mavlinkCamera.photoStatus >= QGCCameraControl.PHOTO_CAPTURE_LAST)
-                    property bool   _mavlinkCameraStorageReady:                 _mavlinkCamera && _mavlinkCamera.storageStatus === QGCCameraControl.STORAGE_READY
-                    property bool   _mavlinkCameraBatteryReady:                 _mavlinkCamera && _mavlinkCamera.batteryRemaining >= 0
-                    property bool   _mavlinkCameraStorageSupported:             _mavlinkCamera && _mavlinkCamera.storageStatus !== QGCCameraControl.STORAGE_NOT_SUPPORTED
-                    property bool   _mavlinkCameraAllowsPhotoWhileRecording:    false
-                    property bool   _mavlinkCameraCanShoot:                     (!_mavlinkCameraModeUndefined && ((_mavlinkCameraStorageReady && _mavlinkCamera.storageFree > 0) || !_mavlinkCameraStorageSupported)) || _videoStreamManager.streaming
-                    property bool   _mavlinkCameraIsShooting:                   ((_mavlinkCameraInVideoMode && _mavlinkCameraVideoIsRecording) || (_mavlinkCameraInPhotoMode && !_mavlinkCameraPhotoCaptureIsIdle)) || _videoStreamManager.recording
-
-                    // The following settings and functions unify between a mavlink camera and a simple video stream for simple access
-
-                    property bool   _anyVideoStreamAvailable:                   _videoStreamManager.hasVideo
-                    property string _cameraName:                                _mavlinkCamera ? _mavlinkCameraName : ""
-                    property bool   _showModeIndicator:                         _mavlinkCamera ? _mavlinkCameraHasModes : _videoStreamManager.hasVideo
-                    property bool   _modeIndicatorPhotoMode:                    _mavlinkCamera ? _mavlinkCameraInPhotoMode : _videoStreamInPhotoMode || _onlySimpleCameraAvailable
-                    property bool   _allowsPhotoWhileRecording:                  _mavlinkCamera ? _mavlinkCameraAllowsPhotoWhileRecording : _videoStreamAllowsPhotoWhileRecording
-                    property bool   _switchToPhotoModeAllowed:                  !_modeIndicatorPhotoMode && (_mavlinkCamera ? !_mavlinkCameraIsShooting : true)
-                    property bool   _switchToVideoModeAllowed:                  _modeIndicatorPhotoMode && (_mavlinkCamera ? !_mavlinkCameraIsShooting : true)
-                    property bool   _videoIsRecording:                          _mavlinkCamera ? _mavlinkCameraIsShooting : _videoStreamRecording
-                    property bool   _canShootInCurrentMode:                     _mavlinkCamera ? _mavlinkCameraCanShoot : _videoStreamCanShoot || _simpleCameraAvailable
-                    property bool   _isShootingInCurrentMode:                   _mavlinkCamera ? _mavlinkCameraIsShooting : _videoStreamIsShootingInCurrentMode || _simpleCameraIsShootingInCurrentMode
-
-                    Timer {
-                        id:             simplePhotoCaptureTimer
-                        interval:       500
-                        onTriggered:    videoPhotoToggle._simplePhotoCaptureIsIdle = true
-                    }
-
-                    function toggleShooting() {
-                        if (_mavlinkCamera && _mavlinkCamera.capturesVideo) {
-                            if(_mavlinkCameraInVideoMode) {
-                                _mavlinkCamera.toggleVideo()
-                            } else {
-                                if(_mavlinkCameraInPhotoMode && !_mavlinkCameraPhotoCaptureIsIdle && _mavlinkCameraElapsedMode) {
-                                    _mavlinkCamera.stopTakePhoto()
-                                } else {
-                                    _mavlinkCamera.takePhoto()
-                                }
-                            }
-                        } else if (_anyVideoStreamAvailable) {
-                            if (_videoStreamInPhotoMode) {
-                                _simplePhotoCaptureIsIdle = false
-                                _videoStreamManager.grabImage()
-                                simplePhotoCaptureTimer.start()
-                            } else {
-                                if (_videoStreamManager.recording) {
-                                    _videoStreamManager.stopRecording()
-                                } else {
-                                    _videoStreamManager.startRecording()
-                                }
-                            }
-                        }
-                    }
-
-                    width: parent.width
-                    height: valueBarPrimary.itemHeight *1.5
-
-                    Text {
-                        id: photo_cap_text
-                        text: qsTr("PHOTO CAP")
-                        font.pixelSize: 8;
-                        font.bold: true
-
-                        color: "white";
-                        anchors.horizontalCenter: parent.horizontalCenter;
-                        anchors.top: parent.top;
-                        anchors.topMargin: 3
-                        font.family:    ScreenTools.normalFontFamily
-                    }   
+                Rectangle {
+                    // Layout.alignment:   Qt.AlignHCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: video_rec_text.bottom
+                    anchors.topMargin: 7
+                    color:              Qt.rgba(0,0,0,0)
+                    // height:             parent.height * 0.75
+                    // width: height
+                    width: parent.width * 0.7
+                    height: width
+                    radius:             width * 0.5
+                    border.color:       qgcPal.buttonText
+                    border.width:       3
 
                     Rectangle {
-                        Layout.alignment:   Qt.AlignHCenter
-                        color:              Qt.rgba(0,0,0,0)
-                        anchors.top: photo_cap_text.bottom
-                        anchors.topMargin: 7
-                        width: parent.width
+                        anchors.centerIn:   parent
+                        width:              parent.width * (videoRecordToggle._isShootingInCurrentMode ? 0.5 : 0.75)
                         height:             width
-                        radius:             width * 0.5
-                        border.color:       qgcPal.buttonText
-                        border.width:       3
+                        radius:             videoRecordToggle._isShootingInCurrentMode ? 0 : width * 0.5
+                        color:              videoRecordToggle._canShootInCurrentMode ? qgcPal.colorRed : qgcPal.colorGrey
+                    }
 
-                        Rectangle {
-                            anchors.centerIn:   parent
-                            width:              parent.width * (videoPhotoToggle._isShootingInCurrentMode ? 0.5 : 0.75)
-                            height:             width
-                            radius:             videoPhotoToggle._isShootingInCurrentMode ? 0 : width * 0.5
-                            color:              videoPhotoToggle._canShootInCurrentMode ? qgcPal.text : qgcPal.colorGrey
-                        }
+                    MouseArea {
+                        anchors.fill:   parent
+                        enabled:        videoRecordToggle._canShootInCurrentMode
+                        onClicked:      videoRecordToggle.toggleShooting()
+                    }
+                }
 
-                        MouseArea {
-                            anchors.fill:   parent
-                            enabled:        videoPhotoToggle._canShootInCurrentMode
-                            onClicked:      videoPhotoToggle.toggleShooting()
+
+            }
+
+
+            //Video Photo capture
+            Item{
+                id: videoPhotoToggle
+
+
+
+                // The following properties relate to a simple camera
+                property var    _flyViewSettings:                           QGroundControl.settingsManager.flyViewSettings
+                property bool   _simpleCameraAvailable:                     !_mavlinkCamera && _activeVehicle && _flyViewSettings.showSimpleCameraControl.rawValue
+                property bool   _onlySimpleCameraAvailable:                 !_anyVideoStreamAvailable && _simpleCameraAvailable
+                property bool   _simpleCameraIsShootingInCurrentMode:       _onlySimpleCameraAvailable && !_simplePhotoCaptureIsIdle
+
+                // The following properties relate to a simple video stream
+                property bool   _videoStreamAvailable:                      _videoStreamManager.hasVideo
+                property var    _videoStreamSettings:                       QGroundControl.settingsManager.videoSettings
+                property var    _videoStreamManager:                        QGroundControl.videoManager
+                property bool   _videoStreamAllowsPhotoWhileRecording:      true
+                property bool   _videoStreamIsStreaming:                    _videoStreamManager.streaming
+                property bool   _simplePhotoCaptureIsIdle:             true
+                property bool   _videoStreamRecording:                      _videoStreamManager.recording
+                property bool   _videoStreamCanShoot:                       _videoStreamIsStreaming
+                property bool   _videoStreamIsShootingInCurrentMode:        _videoStreamInPhotoMode ? !_simplePhotoCaptureIsIdle : _videoStreamRecording
+                property bool   _videoStreamInPhotoMode:                    true
+
+                // The following properties relate to a mavlink protocol camera
+                property var    _mavlinkCameraManager:                      _activeVehicle ? _activeVehicle.cameraManager : null
+                property int    _mavlinkCameraManagerCurCameraIndex:        _mavlinkCameraManager ? _mavlinkCameraManager.currentCamera : -1
+                property bool   _noMavlinkCameras:                          _mavlinkCameraManager ? _mavlinkCameraManager.cameras.count === 0 : true
+                property var    _mavlinkCamera:                             !_noMavlinkCameras ? (_mavlinkCameraManager.cameras.get(_mavlinkCameraManagerCurCameraIndex) && _mavlinkCameraManager.cameras.get(_mavlinkCameraManagerCurCameraIndex).paramComplete ? _mavlinkCameraManager.cameras.get(_mavlinkCameraManagerCurCameraIndex) : null) : null
+                property bool   _multipleMavlinkCameras:                    _mavlinkCameraManager ? _mavlinkCameraManager.cameras.count > 1 : false
+                property string _mavlinkCameraName:                         _mavlinkCamera && _multipleMavlinkCameras ? _mavlinkCamera.modelName : ""
+                property bool   _noMavlinkCameraStreams:                    _mavlinkCamera ? _mavlinkCamera.streamLabels.length : true
+                property bool   _multipleMavlinkCameraStreams:              _mavlinkCamera ? _mavlinkCamera.streamLabels.length > 1 : false
+                property int    _mavlinCameraCurStreamIndex:                _mavlinkCamera ? _mavlinkCamera.currentStream : -1
+                property bool   _mavlinkCameraHasThermalVideoStream:        _mavlinkCamera ? _mavlinkCamera.thermalStreamInstance : false
+                property bool   _mavlinkCameraModeUndefined:                _mavlinkCamera ? _mavlinkCamera.cameraMode === QGCCameraControl.CAM_MODE_UNDEFINED : true
+                property bool   _mavlinkCameraInVideoMode:                  _mavlinkCamera ? _mavlinkCamera.cameraMode === QGCCameraControl.CAM_MODE_VIDEO : false
+                property bool   _mavlinkCameraInPhotoMode:                  _mavlinkCamera ? _mavlinkCamera.cameraMode === QGCCameraControl.CAM_MODE_PHOTO : false
+                property bool   _mavlinkCameraElapsedMode:                  _mavlinkCamera && _mavlinkCamera.cameraMode === QGCCameraControl.CAM_MODE_PHOTO && _mavlinkCamera.photoMode === QGCCameraControl.PHOTO_CAPTURE_TIMELAPSE
+                property bool   _mavlinkCameraHasModes:                     _mavlinkCamera && _mavlinkCamera.hasModes
+                property bool   _mavlinkCameraVideoIsRecording:             _mavlinkCamera && _mavlinkCamera.videoStatus === QGCCameraControl.VIDEO_CAPTURE_STATUS_RUNNING
+                property bool   _mavlinkCameraPhotoCaptureIsIdle:           _mavlinkCamera && (_mavlinkCamera.photoStatus === QGCCameraControl.PHOTO_CAPTURE_IDLE || _mavlinkCamera.photoStatus >= QGCCameraControl.PHOTO_CAPTURE_LAST)
+                property bool   _mavlinkCameraStorageReady:                 _mavlinkCamera && _mavlinkCamera.storageStatus === QGCCameraControl.STORAGE_READY
+                property bool   _mavlinkCameraBatteryReady:                 _mavlinkCamera && _mavlinkCamera.batteryRemaining >= 0
+                property bool   _mavlinkCameraStorageSupported:             _mavlinkCamera && _mavlinkCamera.storageStatus !== QGCCameraControl.STORAGE_NOT_SUPPORTED
+                property bool   _mavlinkCameraAllowsPhotoWhileRecording:    false
+                property bool   _mavlinkCameraCanShoot:                     (!_mavlinkCameraModeUndefined && ((_mavlinkCameraStorageReady && _mavlinkCamera.storageFree > 0) || !_mavlinkCameraStorageSupported)) || _videoStreamManager.streaming
+                property bool   _mavlinkCameraIsShooting:                   ((_mavlinkCameraInVideoMode && _mavlinkCameraVideoIsRecording) || (_mavlinkCameraInPhotoMode && !_mavlinkCameraPhotoCaptureIsIdle)) || _videoStreamManager.recording
+
+                // The following settings and functions unify between a mavlink camera and a simple video stream for simple access
+
+                property bool   _anyVideoStreamAvailable:                   _videoStreamManager.hasVideo
+                property string _cameraName:                                _mavlinkCamera ? _mavlinkCameraName : ""
+                property bool   _showModeIndicator:                         _mavlinkCamera ? _mavlinkCameraHasModes : _videoStreamManager.hasVideo
+                property bool   _modeIndicatorPhotoMode:                    _mavlinkCamera ? _mavlinkCameraInPhotoMode : _videoStreamInPhotoMode || _onlySimpleCameraAvailable
+                property bool   _allowsPhotoWhileRecording:                  _mavlinkCamera ? _mavlinkCameraAllowsPhotoWhileRecording : _videoStreamAllowsPhotoWhileRecording
+                property bool   _switchToPhotoModeAllowed:                  !_modeIndicatorPhotoMode && (_mavlinkCamera ? !_mavlinkCameraIsShooting : true)
+                property bool   _switchToVideoModeAllowed:                  _modeIndicatorPhotoMode && (_mavlinkCamera ? !_mavlinkCameraIsShooting : true)
+                property bool   _videoIsRecording:                          _mavlinkCamera ? _mavlinkCameraIsShooting : _videoStreamRecording
+                property bool   _canShootInCurrentMode:                     _mavlinkCamera ? _mavlinkCameraCanShoot : _videoStreamCanShoot || _simpleCameraAvailable
+                property bool   _isShootingInCurrentMode:                   _mavlinkCamera ? _mavlinkCameraIsShooting : _videoStreamIsShootingInCurrentMode || _simpleCameraIsShootingInCurrentMode
+
+                Timer {
+                    id:             simplePhotoCaptureTimer
+                    interval:       500
+                    onTriggered:    videoPhotoToggle._simplePhotoCaptureIsIdle = true
+                }
+
+                function toggleShooting() {
+                    if (_mavlinkCamera && _mavlinkCamera.capturesVideo) {
+                        if(_mavlinkCameraInVideoMode) {
+                            _mavlinkCamera.toggleVideo()
+                        } else {
+                            if(_mavlinkCameraInPhotoMode && !_mavlinkCameraPhotoCaptureIsIdle && _mavlinkCameraElapsedMode) {
+                                _mavlinkCamera.stopTakePhoto()
+                            } else {
+                                _mavlinkCamera.takePhoto()
+                            }
                         }
+                    } else if (_anyVideoStreamAvailable) {
+                        if (_videoStreamInPhotoMode) {
+                            _simplePhotoCaptureIsIdle = false
+                            _videoStreamManager.grabImage()
+                            simplePhotoCaptureTimer.start()
+                        } else {
+                            if (_videoStreamManager.recording) {
+                                _videoStreamManager.stopRecording()
+                            } else {
+                                _videoStreamManager.startRecording()
+                            }
+                        }
+                    }
+                }
+
+                width: parent.width
+                height: valueBarPrimary.itemHeight * 1.5
+
+                Text {
+                    id: photo_cap_text
+                    text: qsTr("Photo Cap")
+                    font.bold: true
+
+                    color: "white";
+                    anchors.horizontalCenter: parent.horizontalCenter;
+                    anchors.top: parent.top;
+                    anchors.topMargin: 3
+                    font.family:    ScreenTools.normalFontFamily
+                    font.pointSize:     ScreenTools.defaultFontPointSize * 1
+                }
+
+                Rectangle {
+                    // Layout.alignment:   Qt.AlignHCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    color:              Qt.rgba(0,0,0,0)
+                    anchors.top: photo_cap_text.bottom
+                    anchors.topMargin: 7
+                    // height:             parent.height * 0.75
+                    // width: height
+                    width: parent.width * 0.7
+                    height: width
+                    radius:             width * 0.5
+                    border.color:       qgcPal.buttonText
+                    border.width:       3
+
+                    Rectangle {
+                        anchors.centerIn:   parent
+                        width:              parent.width * (videoPhotoToggle._isShootingInCurrentMode ? 0.5 : 0.75)
+                        height:             width
+                        radius:             videoPhotoToggle._isShootingInCurrentMode ? 0 : width * 0.5
+                        color:              videoPhotoToggle._canShootInCurrentMode ? qgcPal.text : qgcPal.colorGrey
+                    }
+
+                    MouseArea {
+                        anchors.fill:   parent
+                        enabled:        videoPhotoToggle._canShootInCurrentMode
+                        onClicked:      videoPhotoToggle.toggleShooting()
                     }
                 }
             }
+
+
+            Item{
+                width: parent.width
+                height: valueBarPrimary.itemHeight
+                //Messsage indicator
+                Loader {
+                    anchors.centerIn: parent
+                    width: parent.width
+                    height: parent.height
+
+                    // anchors.top:        parent.top
+                    // anchors.bottom:     parent.bottom
+                    // anchors.margins: _toolIndicatorMargins
+
+                    source:             "qrc:/toolbar/MessageIndicator.qml"
+                    visible:            item.showIndicator
+                }
+            }
+
         }
+
+        // Item{
+        //     anchors.fill: parent
+        //     // color: "#80000000"
+
+        // }
     }
 
-    
 
 }
