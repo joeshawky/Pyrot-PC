@@ -4019,3 +4019,8 @@ void Vehicle::triggerSimpleCamera()
                    0.0, 0.0, 0.0, 0.0,          // param 1-4 unused
                    1.0);                        // trigger camera
 }
+
+void Vehicle::sayWelcome(void)
+{
+    _say(tr("Welcome lenta marine"));
+}

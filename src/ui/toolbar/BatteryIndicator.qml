@@ -100,13 +100,6 @@ Item {
                 fillMode:           Image.PreserveAspectFit
                 color:              getBatteryColor()
             }
-
-            QGCLabel {
-                text:                   getBatteryPercentageText()
-                font.pointSize:         ScreenTools.mediumFontPointSize
-                color:                  getBatteryColor()
-                anchors.verticalCenter: parent.verticalCenter
-            }
         }
     }
 

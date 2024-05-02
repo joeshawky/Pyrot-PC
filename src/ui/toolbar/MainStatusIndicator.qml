@@ -33,22 +33,20 @@ RowLayout {
         font.pointSize: _vehicleInAir ? ScreenTools.defaultFontPointSize : ScreenTools.largeFontPointSize
 
         property string _commLostText:      qsTr("Communication Lost")
-        property string _readyToFlyText:    qsTr("Ready To Fly")
+        property string _readyToFlyText:    qsTr("Ready To Dive")
         property string _notReadyToFlyText: qsTr("Not Ready")
         property string _disconnectedText:  qsTr("Disconnected")
         property string _armedText:         qsTr("Armed")
-        property string _flyingText:        qsTr("Flying")
+        property string _flyingText:        qsTr("Diving")
         property string _landingText:       qsTr("Landing")
 
         function mainStatusText() {
             var statusText
             if (_activeVehicle) {
                 if (_communicationLost) {
-                    _mainStatusBGColor = "red"
                     return mainStatusLabel._commLostText
                 }
                 if (_activeVehicle.armed) {
-                    _mainStatusBGColor = "green"
                     if (_activeVehicle.flying) {
                         return mainStatusLabel._flyingText
                     } else if (_activeVehicle.landing) {
@@ -59,25 +57,20 @@ RowLayout {
                 } else {
                     if (_activeVehicle.readyToFlyAvailable) {
                         if (_activeVehicle.readyToFly) {
-                            _mainStatusBGColor = "green"
                             return mainStatusLabel._readyToFlyText
                         } else {
-                            _mainStatusBGColor = "yellow"
                             return mainStatusLabel._notReadyToFlyText
                         }
                     } else {
                         // Best we can do is determine readiness based on AutoPilot component setup and health indicators from SYS_STATUS
                         if (_activeVehicle.allSensorsHealthy && _activeVehicle.autopilot.setupComplete) {
-                            _mainStatusBGColor = "green"
                             return mainStatusLabel._readyToFlyText
                         } else {
-                            _mainStatusBGColor = "yellow"
                             return mainStatusLabel._notReadyToFlyText
                         }
                     }
                 }
             } else {
-                _mainStatusBGColor = qgcPal.brandingPurple
                 return mainStatusLabel._disconnectedText
             }
         }

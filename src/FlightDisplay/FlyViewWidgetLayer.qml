@@ -106,25 +106,32 @@ Item {
         visible:            !multiVehiclePanelSelector.showSingleVehiclePanel
     }
 
-    FlyViewInstrumentPanel {
-        id:                         instrumentPanel
-        anchors.margins:            _toolsMargin
-        anchors.top:                multiVehiclePanelSelector.visible ? multiVehiclePanelSelector.bottom : parent.top
-        anchors.right:              parent.right
-        width:                      _rightPanelWidth
-        spacing:                    _toolsMargin
-        visible:                    QGroundControl.corePlugin.options.flyView.showInstrumentPanel && multiVehiclePanelSelector.showSingleVehiclePanel
-        availableHeight:            parent.height - y - _toolsMargin
+    /*
+    The following component is the
+    fly view instrument panel at the
+    top right of the main screen.
+    it shows roll, pitch on the left
+    side and heading on the right side.
+    */
+//     FlyViewInstrumentPanel {
+//         id:                         instrumentPanel
+//         anchors.margins:            _toolsMargin
+//         anchors.top:                multiVehiclePanelSelector.visible ? multiVehiclePanelSelector.bottom : parent.top
+//         anchors.right:              parent.right
+//         width:                      _rightPanelWidth
+//         spacing:                    _toolsMargin
+//         visible:                    QGroundControl.corePlugin.options.flyView.showInstrumentPanel && multiVehiclePanelSelector.showSingleVehiclePanel
+//         availableHeight:            parent.height - y - _toolsMargin
 
-        property real rightInset: visible ? parent.width - x : 0
-    }
+//         property real rightInset: visible ? parent.width - x : 0
+//     }
 
     PhotoVideoControl {
         id:                     photoVideoControl
         anchors.margins:        _toolsMargin
         anchors.right:          parent.right
-        width:                  _rightPanelWidth
-        state:                  _verticalCenter ? "verticalCenter" : "topAnchor"
+        width:                  _rightPanelWidth * 0.55
+        anchors.bottom: parent.bottom
         states: [
             State {
                 name: "verticalCenter"
@@ -233,20 +240,25 @@ Item {
         property bool _virtualJoystickEnabled: QGroundControl.settingsManager.appSettings.virtualJoystick.rawValue
     }
 
-    FlyViewToolStrip {
-        id:                     toolStrip
-        anchors.leftMargin:     _toolsMargin + parentToolInsets.leftEdgeCenterInset
-        anchors.topMargin:      _toolsMargin + parentToolInsets.topEdgeLeftInset
-        anchors.left:           parent.left
-        anchors.top:            parent.top
-        z:                      QGroundControl.zOrderWidgets
-        maxHeight:              parent.height - y - parentToolInsets.bottomEdgeLeftInset - _toolsMargin
-        visible:                !QGroundControl.videoManager.fullScreen
+    /*
+    The next component is the 3 buttons on the top left 
+    of the main screen. if you want it to be shown then
+    uncomment the following component.
+    */
+    // FlyViewToolStrip {
+    //     id:                     toolStrip
+    //     anchors.leftMargin:     _toolsMargin + parentToolInsets.leftEdgeCenterInset
+    //     anchors.topMargin:      _toolsMargin + parentToolInsets.topEdgeLeftInset
+    //     anchors.left:           parent.left
+    //     anchors.top:            parent.top
+    //     z:                      QGroundControl.zOrderWidgets
+    //     maxHeight:              parent.height - y - parentToolInsets.bottomEdgeLeftInset - _toolsMargin
+    //     visible:                !QGroundControl.videoManager.fullScreen
 
-        onDisplayPreFlightChecklist: mainWindow.showPopupDialogFromComponent(preFlightChecklistPopup)
+    //     onDisplayPreFlightChecklist: mainWindow.showPopupDialogFromComponent(preFlightChecklistPopup)
 
-        property real leftInset: x + width
-    }
+    //     property real leftInset: x + width
+    // }
 
     FlyViewAirspaceIndicator {
         anchors.top:                parent.top
@@ -276,6 +288,96 @@ Item {
     Component {
         id: preFlightChecklistPopup
         FlyViewPreFlightChecklistPopup {
+        }
+    }
+
+
+    /*
+    This timer runs every 2.5 seconds and 
+    sets loadCustomAddedLentaComponents variable
+    to true when all the parameters are loaded.
+    this is needed because if we try to load all custom
+    components without all the parameters loaded then
+    we get errors and none of our components would appear.
+    So we must add our custom components after all the
+    parameters are loaded
+    */
+    Timer{
+        interval: 2500
+        running: true
+        repeat: true
+        property bool   _communicationLost: _activeVehicle ? _activeVehicle.vehicleLinkManager.communicationLost : false
+        property bool   _paramsLoaded: _activeVehicle ? _activeVehicle.initialConnectComplete : false
+        property bool _toggle_btns_initialized : false
+
+        onTriggered: {
+            if (_communicationLost && _toggle_btns_initialized){
+                _activeVehicle.loadCustomAddedLentaComponents = false;
+                _toggle_btns_initialized = false;
+
+            } else if (_paramsLoaded && !_toggle_btns_initialized && !_communicationLost){
+                _activeVehicle.loadCustomAddedLentaComponents = true;
+                _toggle_btns_initialized = true;
+                _activeVehicle.sayWelcome();
+            }
+        }
+    }
+
+     Loader{
+        id: videoLoader
+        sourceComponent: lentaVideoRecordingState
+        anchors.right: _root.right
+        anchors.top: _root.top
+    }
+
+    Component{
+        id: lentaVideoRecordingState
+
+        Item{
+            id: lentaVideoRecordingItem
+            height: 150
+            width: 250
+            visible: (QGroundControl.videoManager.recording)
+
+            Rectangle{
+                id: recordingTimer
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+
+                width: 40
+                height: 40
+                radius: 40
+
+                color: "red"
+
+                opacity: 0
+
+            }
+
+            Text{
+                anchors.left: recordingTimer.right
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.leftMargin: 15
+                color: "white"
+                font.pixelSize: 25
+                text: "Recording"
+                font.family:    ScreenTools.normalFontFamily
+            }
+
+            Timer{
+                interval: 500
+                running: true
+                repeat: true
+
+                onTriggered: {
+
+                    if(recordingTimer.opacity == 0){
+                        recordingTimer.opacity = 1;
+                    }else{
+                        recordingTimer.opacity = 0;
+                    }
+                }
+            }
         }
     }
 }
