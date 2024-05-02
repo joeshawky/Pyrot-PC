@@ -30,10 +30,12 @@ RowLayout {
     QGCLabel {
         id:             mainStatusLabel
         text:           mainStatusText()
-        font.pointSize: _vehicleInAir ? ScreenTools.defaultFontPointSize : ScreenTools.largeFontPointSize
+        // font.pointSize: _vehicleInAir ? ScreenTools.defaultFontPointSize * 0.5 : ScreenTools.largeFontPointSize * 0.5
+        font.pointSize: ScreenTools.defaultFontPointSize
 
         property string _commLostText:      qsTr("Communication Lost")
-        property string _readyToFlyText:    qsTr("Ready To Dive")
+        // property string _readyToFlyText:    qsTr("Ready To Dive")
+        property string _readyToFlyText:    qsTr("Ready")
         property string _notReadyToFlyText: qsTr("Not Ready")
         property string _disconnectedText:  qsTr("Disconnected")
         property string _armedText:         qsTr("Armed")
@@ -44,9 +46,12 @@ RowLayout {
             var statusText
             if (_activeVehicle) {
                 if (_communicationLost) {
+                    _mainStatusBGColor = "red"
                     return mainStatusLabel._commLostText
                 }
                 if (_activeVehicle.armed) {
+                    _mainStatusBGColor = "#3BC5EF"
+
                     if (_activeVehicle.flying) {
                         return mainStatusLabel._flyingText
                     } else if (_activeVehicle.landing) {
@@ -55,6 +60,7 @@ RowLayout {
                         return mainStatusLabel._armedText
                     }
                 } else {
+                    _mainStatusBGColor = "#3BC5EF"
                     if (_activeVehicle.readyToFlyAvailable) {
                         if (_activeVehicle.readyToFly) {
                             return mainStatusLabel._readyToFlyText
@@ -85,10 +91,10 @@ RowLayout {
         }
     }
 
-    Item {
-        Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * ScreenTools.largeFontPointRatio * 1.5
-        height:                 1
-    }
+    // Item {
+    //     Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * ScreenTools.largeFontPointRatio * 1.5 * 0.1
+    //     height:                 1
+    // }
 
 }
 
