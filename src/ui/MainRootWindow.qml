@@ -418,6 +418,7 @@ ApplicationWindow {
                     ColumnLayout {
                         width:      innerLayout.width
                         spacing:    0
+                        Layout.alignment: Qt.AlignHCenter
 
                         QGCLabel {
                             id:                     versionLabel
