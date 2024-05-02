@@ -57,6 +57,7 @@ ApplicationWindow {
         }
 
         function nextPrompt() {
+            // console.log(`nextPromptIdIndex: ${nextPromptIdIndex}, rgPromptIds.length: ${rgPromptIds.length}`)
             if (nextPromptIdIndex < rgPromptIds.length) {
                 currentDialog = showPopupDialogFromSource(QGroundControl.corePlugin.firstRunPromptResource(rgPromptIds[nextPromptIdIndex]))
                 currentDialog.closed.connect(nextPrompt)
@@ -157,7 +158,7 @@ ApplicationWindow {
     }
 
     function showSetupTool() {
-        showTool(qsTr("Vehicle Setup"), "SetupView.qml", "/qmlimages/Gears.svg")
+        showTool(qsTr("Vehicle Settings"), "SetupView.qml", "/qmlimages/Gears.svg")
     }
 
     function showSettingsTool() {
@@ -330,7 +331,8 @@ ApplicationWindow {
     /// Toolbar
     header: MainToolBar {
         id:         toolbar
-        height:     ScreenTools.toolbarHeight + 5
+        // height:     ScreenTools.toolbarHeight + 5
+        height: ScreenTools.toolbarHeight * 0.7
         visible:    !QGroundControl.videoManager.fullScreen
     }
 
@@ -368,7 +370,7 @@ ApplicationWindow {
                         id:                 setupButton
                         height:             _toolButtonHeight
                         Layout.fillWidth:   true
-                        text:               qsTr("Vehicle Setup")
+                        text:               qsTr("Vehicle Settings")
                         imageColor:         qgcPal.text
                         imageResource:      "/qmlimages/Gears.svg"
                         onClicked: {
