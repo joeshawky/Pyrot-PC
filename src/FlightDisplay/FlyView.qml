@@ -154,8 +154,12 @@ Item {
         anchors.bottom:         parent.bottom
         anchors.margins:        _toolsMargin
         item1IsFullSettingsKey: "MainFlyWindowIsMap"
-        item1:                  mapControl
-        item2:                  QGroundControl.videoManager.hasVideo ? videoControl : null
+        // item1:                  mapControl
+        // item2:                  QGroundControl.videoManager.hasVideo ? videoControl : null
+        item1:                  videoControl
+        item2:                  mapControl
+        // item1:                  mapControl
+        // item2:                  videoControl
         fullZOrder:             _fullItemZorder
         pipZOrder:              _pipItemZorder
         show:                   !QGroundControl.videoManager.fullScreen &&
