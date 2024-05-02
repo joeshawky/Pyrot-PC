@@ -1,4 +1,4 @@
-# **Lenta Ground Ground**
+# **Pyrot V1.2**
 
 # New features
 - [x] Remove video control block
