@@ -1,4 +1,4 @@
-# **Pyrot**
+# **Pyrot V1.1**
 
 # New features
 - [x] Move video control block to bottom right
