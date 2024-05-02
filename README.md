@@ -1,4 +1,4 @@
-# **Lenta Ground Ground**
+# **Pyrot V1.0**
 
 # New features
 - [x] Change app name to Lenta Ground Control Station.
