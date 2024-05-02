@@ -469,34 +469,34 @@ QList<int> QGCCorePlugin::firstRunPromptCustomIds(void)
 
 QVariantList QGCCorePlugin::firstRunPromptsToShow(void)
 {
-    QList<int> rgIdsToShow;
+    // QList<int> rgIdsToShow;
 
-    rgIdsToShow.append(firstRunPromptStdIds());
-    rgIdsToShow.append(firstRunPromptCustomIds());
+    // rgIdsToShow.append(firstRunPromptStdIds());
+    // rgIdsToShow.append(firstRunPromptCustomIds());
 
-    QList<int> rgAlreadyShownIds = AppSettings::firstRunPromptsIdsVariantToList(_toolbox->settingsManager()->appSettings()->firstRunPromptIdsShown()->rawValue());
+    // QList<int> rgAlreadyShownIds = AppSettings::firstRunPromptsIdsVariantToList(_toolbox->settingsManager()->appSettings()->firstRunPromptIdsShown()->rawValue());
 
-    for (int idToRemove: rgAlreadyShownIds) {
-        rgIdsToShow.removeOne(idToRemove);
-    }
+    // for (int idToRemove: rgAlreadyShownIds) {
+    //     rgIdsToShow.removeOne(idToRemove);
+    // }
 
     QVariantList rgVarIdsToShow;
-    for (int id: rgIdsToShow) {
-        rgVarIdsToShow.append(id);
-    }
+    // for (int id: rgIdsToShow) {
+    //     rgVarIdsToShow.append(id);
+    // }
 
     return rgVarIdsToShow;
 }
 
 QString QGCCorePlugin::firstRunPromptResource(int id)
 {
-    switch (id) {
-    case unitsFirstRunPromptId:
-        return "/FirstRunPromptDialogs/UnitsFirstRunPrompt.qml";
-    case offlineVehicleFirstRunPromptId:
-        return "/FirstRunPromptDialogs/OfflineVehicleFirstRunPrompt.qml";
-        break;
-    }
+    // switch (id) {
+    // case unitsFirstRunPromptId:
+    //     return "/FirstRunPromptDialogs/UnitsFirstRunPrompt.qml";
+    // case offlineVehicleFirstRunPromptId:
+    //     return "/FirstRunPromptDialogs/OfflineVehicleFirstRunPrompt.qml";
+    //     break;
+    // }
 
     return QString();
 }
