@@ -1,4 +1,4 @@
-# **Lenta Ground Ground**
+# **Pyrot V1.0**
 
 # New features
 - [x] 3 Extra livestream preview.
