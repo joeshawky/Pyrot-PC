@@ -30,10 +30,12 @@ RowLayout {
     QGCLabel {
         id:             mainStatusLabel
         text:           mainStatusText()
-        font.pointSize: _vehicleInAir ? ScreenTools.defaultFontPointSize : ScreenTools.largeFontPointSize
+        // font.pointSize: _vehicleInAir ? ScreenTools.defaultFontPointSize * 0.5 : ScreenTools.largeFontPointSize * 0.5
+        font.pointSize: ScreenTools.defaultFontPointSize
 
         property string _commLostText:      qsTr("Communication Lost")
-        property string _readyToFlyText:    qsTr("Ready To Dive")
+        // property string _readyToFlyText:    qsTr("Ready To Dive")
+        property string _readyToFlyText:    qsTr("Ready")
         property string _notReadyToFlyText: qsTr("Not Ready")
         property string _disconnectedText:  qsTr("Disconnected")
         property string _armedText:         qsTr("Armed")
@@ -44,9 +46,12 @@ RowLayout {
             var statusText
             if (_activeVehicle) {
                 if (_communicationLost) {
+                    _mainStatusBGColor = "red"
                     return mainStatusLabel._commLostText
                 }
                 if (_activeVehicle.armed) {
+                    _mainStatusBGColor = "#3BC5EF"
+
                     if (_activeVehicle.flying) {
                         return mainStatusLabel._flyingText
                     } else if (_activeVehicle.landing) {
@@ -55,6 +60,7 @@ RowLayout {
                         return mainStatusLabel._armedText
                     }
                 } else {
+                    _mainStatusBGColor = "#3BC5EF"
                     if (_activeVehicle.readyToFlyAvailable) {
                         if (_activeVehicle.readyToFly) {
                             return mainStatusLabel._readyToFlyText
@@ -85,164 +91,10 @@ RowLayout {
         }
     }
 
-    Item {
-        Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * ScreenTools.largeFontPointRatio * 1.5
-        height:                 1
-    }
+    // Item {
+    //     Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * ScreenTools.largeFontPointRatio * 1.5 * 0.1
+    //     height:                 1
+    // }
 
-    QGCColoredImage {
-        id:         flightModeIcon
-        width:      ScreenTools.defaultFontPixelWidth * 2
-        height:     ScreenTools.defaultFontPixelHeight * 0.75
-        fillMode:   Image.PreserveAspectFit
-        mipmap:     true
-        color:      qgcPal.text
-        source:     "/qmlimages/FlightModesComponentIcon.png"
-        visible:    flightModeMenu.visible
-    }
-
-    Item {
-        Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth / 2
-        height:                 1
-        visible:                flightModeMenu.visible
-    }
-
-    FlightModeMenu {
-        id:                     flightModeMenu
-        Layout.preferredHeight: _root.height
-        verticalAlignment:      Text.AlignVCenter
-        font.pointSize:         _vehicleInAir ?  ScreenTools.largeFontPointSize : ScreenTools.defaultFontPointSize
-        mouseAreaLeftMargin:    -(flightModeMenu.x - flightModeIcon.x)
-        visible:                _activeVehicle
-    }
-
-    Item {
-        Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * ScreenTools.largeFontPointRatio * 1.5
-        height:                 1
-        visible:                vtolModeLabel.visible
-    }
-
-    QGCLabel {
-        id:                     vtolModeLabel
-        Layout.preferredHeight: _root.height
-        verticalAlignment:      Text.AlignVCenter
-        text:                   _vtolInFWDFlight ? qsTr("FW(vtol)") : qsTr("MR(vtol)")
-        font.pointSize:         ScreenTools.largeFontPointSize
-        visible:                _activeVehicle ? _activeVehicle.vtol && _vehicleInAir : false
-
-        QGCMouseArea {
-            anchors.fill:   parent
-            onClicked:      mainWindow.showIndicatorPopup(vtolModeLabel, vtolTransitionComponent)
-        }
-    }
-
-    Component {
-        id: sensorStatusInfoComponent
-
-        Rectangle {
-            width:          flickable.width + (_margins * 2)
-            height:         flickable.height + (_margins * 2)
-            radius:         ScreenTools.defaultFontPixelHeight * 0.5
-            color:          qgcPal.window
-            border.color:   qgcPal.text
-
-            QGCFlickable {
-                id:                 flickable
-                anchors.margins:    _margins
-                anchors.top:        parent.top
-                anchors.left:       parent.left
-                width:              mainLayout.width
-                height:             mainWindow.contentItem.height - (indicatorPopup.padding * 2) - (_margins * 2)
-                flickableDirection: Flickable.VerticalFlick
-                contentHeight:      mainLayout.height
-                contentWidth:       mainLayout.width
-
-                ColumnLayout {
-                    id:         mainLayout
-                    spacing:    _spacing
-
-                    QGCButton {
-                        Layout.alignment:   Qt.AlignHCenter
-                        text:               _armed ?  qsTr("Disarm") : (forceArm ? qsTr("Force Arm") : qsTr("Arm"))
-
-                        property bool forceArm: false
-
-                        onPressAndHold: forceArm = true
-
-                        onClicked: {
-                            if (_armed) {
-                                mainWindow.disarmVehicleRequest()
-                            } else {
-                                if (forceArm) {
-                                    mainWindow.forceArmVehicleRequest()
-                                } else {
-                                    mainWindow.armVehicleRequest()
-                                }
-                            }
-                            forceArm = false
-                            mainWindow.hideIndicatorPopup()
-                        }
-                    }
-
-                    QGCLabel {
-                        Layout.alignment:   Qt.AlignHCenter
-                        text:               qsTr("Sensor Status")
-                    }
-
-                    GridLayout {
-                        rowSpacing:     _spacing
-                        columnSpacing:  _spacing
-                        rows:           _activeVehicle.sysStatusSensorInfo.sensorNames.length
-                        flow:           GridLayout.TopToBottom
-
-                        Repeater {
-                            model: _activeVehicle.sysStatusSensorInfo.sensorNames
-
-                            QGCLabel {
-                                text: modelData
-                            }
-                        }
-
-                        Repeater {
-                            model: _activeVehicle.sysStatusSensorInfo.sensorStatus
-
-                            QGCLabel {
-                                text: modelData
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    Component {
-        id: vtolTransitionComponent
-
-        Rectangle {
-            width:          mainLayout.width   + (_margins * 2)
-            height:         mainLayout.height  + (_margins * 2)
-            radius:         ScreenTools.defaultFontPixelHeight * 0.5
-            color:          qgcPal.window
-            border.color:   qgcPal.text
-
-            QGCButton {
-                id:                 mainLayout
-                anchors.margins:    _margins
-                anchors.top:        parent.top
-                anchors.left:       parent.left
-                text:               _vtolInFWDFlight ? qsTr("Transition to Multi-Rotor") : qsTr("Transition to Fixed Wing")
-
-                onClicked: {
-                    if (_vtolInFWDFlight) {
-                        mainWindow.vtolTransitionToMRFlightRequest()
-                    } else {
-                        mainWindow.vtolTransitionToFwdFlightRequest()
-                    }
-                    mainWindow.hideIndicatorPopup()
-                }
-            }
-        }
-    }
 }
 

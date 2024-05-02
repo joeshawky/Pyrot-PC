@@ -35,7 +35,7 @@ QGCComboBox {
     background: Rectangle{
             implicitWidth:  ScreenTools.implicitComboBoxWidth
             implicitHeight: ScreenTools.implicitComboBoxHeight
-            color: "#1A4F84"
+            color: "#212529"
             border.color:   _qgcPal.text
     }
 

@@ -51,6 +51,24 @@ void SubtitleWriter::startCapturingTelemetry(const QString& videoFile)
             _facts += value->fact();
         }
     }
+
+    auto *vehicle = qgcApp()->toolbox()->multiVehicleManager()->activeVehicle();
+
+    _facts.clear();
+
+    _facts += vehicle->getFact("apmSubInfo.lights1");
+    _facts += vehicle->getFact("apmSubInfo.lights2");
+    _facts += vehicle->getFact("FlightTime");
+    _facts += vehicle->getFact("temperature.temperature2");
+    _facts += vehicle->getFact("apmSubInfo.cameraTilt");
+    _facts += vehicle->getFact("apmSubInfo.pilotGain");
+    _facts += vehicle->getFact("apmSubInfo.tetherTurns");
+    _facts += vehicle->altitudeRelative();
+    _facts += vehicle->getFact("apmSubInfo.rangefinderDistance");
+    _facts += vehicle->roll();
+
+//    delete vehicle;
+
     grid->deleteLater();
 
     // One subtitle always starts where the previous ended

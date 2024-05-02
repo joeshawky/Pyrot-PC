@@ -44,7 +44,7 @@ ApplicationWindow {
             color:          Qt.rgba(0,0,0,0.75)
             visible:        !(QGroundControl.videoManager.decoding0)
             QGCLabel {
-                text:               qsTr("WAITING FOR VIDEO")
+                text:               qsTr("Loading video")
                 font.family:        ScreenTools.demiboldFontFamily
                 color:              "white"
                 font.pointSize:     ScreenTools.largeFontPointSize
@@ -73,7 +73,7 @@ ApplicationWindow {
             color:          Qt.rgba(0,0,0,0.75)
             visible:        !(QGroundControl.videoManager.decoding1)
             QGCLabel {
-                text:               qsTr("WAITING FOR VIDEO")
+                text:               qsTr("Loading video")
                 font.family:        ScreenTools.demiboldFontFamily
                 color:              "white"
                 font.pointSize:     ScreenTools.largeFontPointSize
@@ -102,7 +102,7 @@ ApplicationWindow {
             color:          Qt.rgba(0,0,0,0.75)
             visible:        !(QGroundControl.videoManager.decoding2)
             QGCLabel {
-                text:               qsTr("WAITING FOR VIDEO")
+                text:               qsTr("Loading video")
                 font.family:        ScreenTools.demiboldFontFamily
                 color:              "white"
                 font.pointSize:     ScreenTools.largeFontPointSize

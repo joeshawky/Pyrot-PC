@@ -23,7 +23,8 @@ Rectangle {
     id:     _root
 
     // color:  qgcPal.toolbarBackground
-    color: "#1A4F84"
+    // color: "#1A4F84"
+    color: "#212529"
 
     property int currentToolbar: flyViewToolbar
 
@@ -35,7 +36,8 @@ Rectangle {
     property bool   _communicationLost: _activeVehicle ? _activeVehicle.vehicleLinkManager.communicationLost : false
     
     // property color  _mainStatusBGColor: qgcPal.brandingPurple
-    property color  _mainStatusBGColor: qgcPal.colorBlue
+    // property color  _mainStatusBGColor: qgcPal.colorBlue
+    property color  _mainStatusBGColor: "#3BC5EF"
     
     QGCPalette { id: qgcPal }
 
@@ -70,13 +72,25 @@ Rectangle {
 
         QGCToolBarButton {
             id:                     currentButton
-            Layout.preferredHeight: viewButtonRow.height
+            // anchors{
+                // top: parent.top
+                // bottom: parent.bottom
+            // }
+            // Layout.anchors.fill: parent
+
+            // Layout.preferredHeight: viewButtonRow.height
+            Layout.preferredHeight: parent.height
             
             // icon.source:            "/res/QGCLogoFull"
             icon.source:        "/qmlimages/pyrotLogo.png"
 
             logo:                   true
             onClicked:              mainWindow.showToolSelectDialog()
+            // Rectangle{
+            //     anchors.fill: parent
+            //     color: "red"
+            //     opacity: 0.5
+            // }
         }
 
         MainStatusIndicator {
@@ -94,13 +108,15 @@ Rectangle {
 
     QGCFlickable {
         id:                     toolsFlickable
-        anchors.leftMargin:     ScreenTools.defaultFontPixelWidth * ScreenTools.largeFontPointRatio * 1.5
+        // anchors.leftMargin:     ScreenTools.defaultFontPixelWidth * ScreenTools.largeFontPointRatio * 1.5
         anchors.left:           viewButtonRow.right
         anchors.bottomMargin:   1
         anchors.top:            parent.top
         anchors.bottom:         parent.bottom
         anchors.right:          parent.right
-        contentWidth:           indicatorLoader.x + indicatorLoader.width
+        // contentWidth:           indicatorLoader.x + indicatorLoader.width
+        // contentWidth: _root.width * 2
+        contentWidth: _root.width
         flickableDirection:     Flickable.HorizontalFlick
 
         Loader {

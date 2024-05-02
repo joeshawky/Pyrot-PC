@@ -71,7 +71,7 @@ Item {
             _fullItem = item1
             _pipOrWindowItem = null
         }
-        _setPipIsExpanded(QGroundControl.loadBoolGlobalSetting(_pipExpandedSettingsKey, true))
+        _setPipIsExpanded(QGroundControl.loadBoolGlobalSetting(_pipExpandedSettingsKey, false))
     }
 
     function _swapPip() {
