@@ -54,7 +54,7 @@ Row {
     }
 
     function getLightsColor(lightsVal){
-        return (lightsVal > 0) ? qgcPal.colorGreen : "red"
+        return Math.round(indicatorRow.normalize(-137, 138, lightsVal)) > 0 ? qgcPal.colorGreen : "red"
     }
 
     function normalize(minimumNum, maximumNum, input){
