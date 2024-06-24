@@ -163,7 +163,7 @@ ApplicationWindow {
 
     function showSettingsTool() {
         // showTool(qsTr("Application Settings"), "AppSettings.qml", "/res/QGCLogoWhite")
-        showTool(qsTr("Application Settings"), "AppSettings.qml", "/qmlimages/pyrotLog.png")
+        showTool(qsTr("Application Settings"), "AppSettings.qml", "/qmlimages/pyrotLogo.png")
     }
 
     //-------------------------------------------------------------------------
