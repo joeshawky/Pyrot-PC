@@ -1,6 +1,10 @@
-# **Pyrot V1.2**
+# **Pyrot V1.3**
 
 # New features
+- [x] Added backebd logic and frontend UI for L2 & R2 buttons.
+
+  
+# Old features
 - [x] Remove video control block
 - [x] Remove the parameters indicator block on the bottom of the screen
 - [x] Add depth, roll, pitch, heading bar
@@ -11,9 +15,6 @@
 - [x] Pyrot logo gets displayed when there is no live video feedback
 - [x] Remove initial units and vehicle frame prompts
 - [x] Update toolbar's colors and design  
-
-  
-# Old features
 - [x] Move video control block to bottom right
 - [x] Create a red flashing circle when a video is being recorded
 - [x] Remove the 3 buttons on top left of main screen
