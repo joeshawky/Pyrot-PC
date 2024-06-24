@@ -247,6 +247,40 @@ Item {
                             }
                         }
                     }
+                    Repeater{
+                        model: 2
+                        Rectangle{
+                            width:          ScreenTools.defaultFontPixelHeight * 1.5
+                            height:         width
+                            border.width:   1
+                            border.color:   qgcPal.text
+                            color:          {
+                                if (index == 0)
+                                    return _activeJoystick.currentL2 ? qgcPal.buttonHighlight : qgcPal.windowShade
+                                else if (index == 1)
+                                    return _activeJoystick.currentR2 ? qgcPal.buttonHighlight : qgcPal.windowShade
+
+                            }
+
+                            QGCLabel {
+                                anchors.fill:           parent
+                                color:                  {
+                                    if (index == 0)
+                                        return _activeJoystick.currentL2 ? qgcPal.buttonHighlightText : qgcPal.buttonText
+                                    else if (index == 1)
+                                        return _activeJoystick.currentR2 ? qgcPal.buttonHighlightText : qgcPal.buttonText
+                                }
+                                horizontalAlignment:    Text.AlignHCenter
+                                verticalAlignment:      Text.AlignVCenter
+                                text:                   {
+                                    if (index == 0)
+                                        return "L2"
+                                    else if (index == 1)
+                                        return "R2"
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
