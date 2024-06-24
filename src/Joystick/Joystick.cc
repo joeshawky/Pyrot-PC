@@ -16,6 +16,7 @@
 #include "VideoManager.h"
 #include "QGCCameraManager.h"
 #include "QGCCameraControl.h"
+#include "ParameterManager.h"
 
 #include <QSettings>
 
@@ -105,6 +106,10 @@ Joystick::Joystick(const QString& name, int axisCount, int buttonCount, int hatC
     , _hatButtonCount(4 * hatCount)
     , _totalButtonCount(_buttonCount+_hatButtonCount)
     , _multiVehicleManager(multiVehicleManager)
+    , m_L2Action("camera_trigger")
+    , m_R2Action("camera_source_toggle")
+    , m_L2ShiftAction("Disabled")
+    , m_R2ShiftAction("Disabled")
 {
     _rgAxisValues   = new int[static_cast<size_t>(_axisCount)];
     _rgCalibration  = new Calibration_t[static_cast<size_t>(_axisCount)];
@@ -122,6 +127,46 @@ Joystick::Joystick(const QString& name, int axisCount, int buttonCount, int hatC
     connect(_multiVehicleManager, &MultiVehicleManager::activeVehicleChanged, this, &Joystick::_activeVehicleChanged);
 
     _customMavCommands = JoystickMavCommand::load("JoystickMavCommands.json");
+
+
+    connect(this, &Joystick::calibratedChanged, [this](bool calibrated){
+        connect(_activeVehicle, &Vehicle::loadCustomAddedLentaComponentsChanged, [this]{
+            bool parametersReady = _activeVehicle->readyToFlyAvailable() && !_activeVehicle->vehicleLinkManager()->communicationLost();
+            if (!parametersReady)
+                return;
+
+
+            bool parameterExists = _activeVehicle->parameterManager()->parameterExists(-1, "BTN0_FUNCTION");
+            if (!parameterExists)
+                return;
+
+            m_shiftIndexes.clear();
+
+            int shiftIndex = _activeVehicle->parameterManager()->getParameter(-1, "BTN0_FUNCTION")->enumStrings().indexOf("shift");
+            for (int buttonIndex = 0; buttonIndex < _buttonCount; buttonIndex++) {
+                QString parameterName = QString("BTN%1_FUNCTION").arg(buttonIndex);
+                int parameterValue = _activeVehicle->parameterManager()->getParameter(-1, parameterName)->rawValueString().toInt();
+                if (parameterValue == shiftIndex){
+                    m_shiftIndexes.append(buttonIndex);
+                }
+            }
+        });
+    });
+
+
+    connect(this, &Joystick::rawButtonPressedChanged, [this](int index, int pressed){
+
+        if (!pressed){
+            m_shiftPressed = false;
+            // qInfo() << "Shift cancelled.";
+            return;
+        }
+
+        if (m_shiftIndexes.contains(index)){
+            m_shiftPressed = true;
+            // qInfo() << "Shift is being held!";
+        }
+    });
 }
 
 void Joystick::stop()
@@ -492,6 +537,47 @@ void Joystick::run()
     _close();
 }
 
+const QString Joystick::_mapTextIntoAction(const QString &text)
+{
+    static const QMap<QString, QString> actionMap {
+        {"Disabled", "No Action"},
+        {"arm_toggle", "Toggle Arm"},
+        {"arm", "Arm"},
+        {"disarm", "Disarm"},
+        {"camera_trigger", "Trigger Camera"},
+        {"camera_source_toggle", "Toggle Recording Video"}};
+
+    auto it = actionMap.find(text);
+    if (it != actionMap.end()) {
+        return it.value();
+    }
+    // Handle case if action is flight mode
+
+    bool isActionFlightMode = text.contains("mode_");
+    if (isActionFlightMode){
+        QString flightModeAction = text;
+        flightModeAction.replace("mode_", "");
+
+        QStringList words = flightModeAction.split('_', Qt::SkipEmptyParts);
+        for (QString& word : words) {
+            if (!word.isEmpty()) {
+                word[0] = word[0].toUpper();
+                if (word.length() > 1) {
+                    word = word.left(1) + word.mid(1).toLower();
+                }
+            }
+        }
+        flightModeAction = words.join(' ');
+        if (flightModeAction == "Poshold")
+            return "Position Hold";
+
+        return flightModeAction;
+    }
+
+    return text;
+
+}
+
 void Joystick::_handleButtons()
 {
     int lastBbuttonValues[256];
@@ -628,6 +714,12 @@ void Joystick::_handleAxis()
                 gimbalYaw = _adjustRange(_rgAxisValues[axis],   _rgCalibration[axis],_deadband);
             }
 
+            bool l2 = gimbalPitch > 0.6 ? true : false;
+            bool r2 = gimbalYaw > 0.6 ? true : false;
+            setCurrentL2(l2);
+            setCurrentR2(r2);
+
+
             if (_accumulator) {
                 static float throttle_accu = 0.f;
                 throttle_accu += throttle * (40 / 1000.f); //for throttle to change from min to max it will take 1000ms (40ms is a loop time)
@@ -697,6 +789,8 @@ void Joystick::startPolling(Vehicle* vehicle)
             disconnect(this, &Joystick::centerGimbal,       _activeVehicle, &Vehicle::centerGimbal);
             disconnect(this, &Joystick::gimbalControlValue, _activeVehicle, &Vehicle::gimbalControlValue);
             disconnect(this, &Joystick::emergencyStop,      _activeVehicle, &Vehicle::emergencyStop);
+            disconnect(this, &Joystick::currentR2Changed,      this, &Joystick::_handleR2);
+            disconnect(this, &Joystick::currentL2Changed,      this, &Joystick::_handleL2);
         }
         // Always set up the new vehicle
         _activeVehicle = vehicle;
@@ -719,6 +813,8 @@ void Joystick::startPolling(Vehicle* vehicle)
             connect(this, &Joystick::centerGimbal,       _activeVehicle, &Vehicle::centerGimbal);
             connect(this, &Joystick::gimbalControlValue, _activeVehicle, &Vehicle::gimbalControlValue);
             connect(this, &Joystick::emergencyStop,      _activeVehicle, &Vehicle::emergencyStop);
+            connect(this, &Joystick::currentR2Changed,      this, &Joystick::_handleR2);
+            connect(this, &Joystick::currentL2Changed,      this, &Joystick::_handleL2);
         }
     }
     if (!isRunning()) {
@@ -738,6 +834,8 @@ void Joystick::stopPolling(void)
             disconnect(this, &Joystick::gimbalYawStep,      _activeVehicle, &Vehicle::gimbalYawStep);
             disconnect(this, &Joystick::centerGimbal,       _activeVehicle, &Vehicle::centerGimbal);
             disconnect(this, &Joystick::gimbalControlValue, _activeVehicle, &Vehicle::gimbalControlValue);
+            disconnect(this, &Joystick::currentR2Changed,      this, &Joystick::_handleR2);
+            disconnect(this, &Joystick::currentL2Changed,      this, &Joystick::_handleL2);
         }
         _exitThread = true;
     }
@@ -1132,4 +1230,148 @@ void Joystick::_buildActionList(Vehicle* activeVehicle)
         _availableActionTitles << p->action();
     }
     emit assignableActionsChanged();
+}
+
+
+void Joystick::setCurrentR2(bool newCurrentR2)
+{
+    if (m_currentR2 == newCurrentR2)
+        return;
+    m_currentR2 = newCurrentR2;
+    emit currentR2Changed(m_currentR2, m_previousR2);
+}
+
+void Joystick::setCurrentL2(bool newCurrentL2)
+{
+    if (m_currentL2 == newCurrentL2)
+        return;
+    m_currentL2 = newCurrentL2;
+    emit currentL2Changed(m_currentL2, m_previousL2);
+}
+
+void Joystick::_setPreviousR2(bool newPreviousR2)
+{
+    if (m_previousR2 == newPreviousR2)
+        return;
+    m_previousR2 = newPreviousR2;
+}
+
+void Joystick::_setPreviousL2(bool newPreviousL2)
+{
+    if (m_previousL2 == newPreviousL2)
+        return;
+    m_previousL2 = newPreviousL2;
+}
+
+void Joystick::_handleR2(bool currentR2, bool previousR2)
+{
+    //logic
+    if (previousR2 == currentR2)
+        return;
+
+
+    if (!currentR2)
+    {
+        _setPreviousR2(currentR2);
+        return;
+    }
+
+    if (m_shiftPressed){
+        const QString mappedAction = _mapTextIntoAction(m_R2ShiftAction);
+        _executeButtonAction(mappedAction, true);
+    }else{
+        const QString mappedAction = _mapTextIntoAction(m_R2Action);
+        _executeButtonAction(mappedAction, true);
+    }
+
+    _setPreviousR2(currentR2);
+}
+
+void Joystick::_handleL2(bool currentL2, bool previousL2)
+{
+    if (previousL2 == currentL2)
+        return;
+
+
+    if (!currentL2)
+    {
+        _setPreviousL2(currentL2);
+        return;
+    }
+
+    if (m_shiftPressed){
+        const QString mappedAction = _mapTextIntoAction(m_L2ShiftAction);
+        _executeButtonAction(mappedAction, true);
+    }else{
+        const QString mappedAction = _mapTextIntoAction(m_L2Action);
+        _executeButtonAction(mappedAction, true);
+    }
+
+    _setPreviousL2(currentL2);
+
+}
+
+void Joystick::setL2Action(const QString &newL2Action)
+{
+    if (m_L2Action == newL2Action)
+        return;
+    m_L2Action = newL2Action;
+    emit L2ActionChanged();
+}
+
+
+
+QString Joystick::L2Action() const
+{
+    return m_L2Action;
+}
+
+QString Joystick::R2Action() const
+{
+    return m_R2Action;
+}
+
+bool Joystick::currentL2() const
+{
+    return m_currentL2;
+}
+
+
+bool Joystick::currentR2() const
+{
+    return m_currentR2;
+}
+
+void Joystick::setR2Action(const QString &newR2Action)
+{
+    if (m_R2Action == newR2Action)
+        return;
+    m_R2Action = newR2Action;
+    emit R2ActionChanged();
+}
+
+QString Joystick::L2ShiftAction() const
+{
+    return m_L2ShiftAction;
+}
+
+void Joystick::setL2ShiftAction(const QString &newL2ShiftAction)
+{
+    if (m_L2ShiftAction == newL2ShiftAction)
+        return;
+    m_L2ShiftAction = newL2ShiftAction;
+    emit L2ShiftActionChanged();
+}
+
+QString Joystick::R2ShiftAction() const
+{
+    return m_R2ShiftAction;
+}
+
+void Joystick::setR2ShiftAction(const QString &newR2ShiftAction)
+{
+    if (m_R2ShiftAction == newR2ShiftAction)
+        return;
+    m_R2ShiftAction = newR2ShiftAction;
+    emit R2ShiftActionChanged();
 }

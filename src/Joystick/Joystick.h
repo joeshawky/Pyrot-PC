@@ -20,6 +20,7 @@
 #include "MultiVehicleManager.h"
 #include "JoystickMavCommand.h"
 #include <atomic>
+#include "FactPanelController.h"
 
 Q_DECLARE_LOGGING_CATEGORY(JoystickLog)
 Q_DECLARE_LOGGING_CATEGORY(JoystickValuesLog)
@@ -113,6 +114,15 @@ public:
     Q_PROPERTY(bool     accumulator             READ accumulator            WRITE setAccumulator        NOTIFY accumulatorChanged)
     Q_PROPERTY(bool     circleCorrection        READ circleCorrection       WRITE setCircleCorrection   NOTIFY circleCorrectionChanged)
 
+    Q_PROPERTY(bool currentL2 READ currentL2 WRITE setCurrentL2 NOTIFY currentL2Changed FINAL)
+    Q_PROPERTY(bool currentR2 READ currentR2 WRITE setCurrentR2 NOTIFY currentR2Changed FINAL)
+
+    Q_PROPERTY(QString L2Action READ L2Action WRITE setL2Action NOTIFY L2ActionChanged FINAL)
+    Q_PROPERTY(QString R2Action READ R2Action WRITE setR2Action NOTIFY R2ActionChanged FINAL)
+
+    Q_PROPERTY(QString L2ShiftAction READ L2ShiftAction WRITE setL2ShiftAction NOTIFY L2ShiftActionChanged FINAL)
+    Q_PROPERTY(QString R2ShiftAction READ R2ShiftAction WRITE setR2ShiftAction NOTIFY R2ShiftActionChanged FINAL)
+
     Q_INVOKABLE void    setButtonRepeat     (int button, bool repeat);
     Q_INVOKABLE bool    getButtonRepeat     (int button);
     Q_INVOKABLE void    setButtonAction     (int button, const QString& action);
@@ -183,6 +193,26 @@ public:
     /// Set joystick button repeat rate (in Hz)
     void  setButtonFrequency(float val);
 
+    bool currentL2() const;
+    void setCurrentL2(bool newCurrentL2);
+
+    bool currentR2() const;
+    void setCurrentR2(bool newCurrentR2);
+
+    QString L2Action() const;
+    void setL2Action(const QString &newL2Action);
+
+    QString R2Action() const;
+    void setR2Action(const QString &newR2Action);
+
+
+
+    QString L2ShiftAction() const;
+    void setL2ShiftAction(const QString &newL2ShiftAction);
+
+    QString R2ShiftAction() const;
+    void setR2ShiftAction(const QString &newR2ShiftAction);
+
 signals:
     // The raw signals are only meant for use by calibration
     void rawAxisValueChanged        (int index, int value);
@@ -218,6 +248,18 @@ signals:
     void setFlightMode              (const QString& flightMode);
     void emergencyStop              ();
 
+    void currentR2Changed(bool currentR2, bool previousR2);
+
+    void currentL2Changed(bool currentL2, bool previousL2);
+
+    void L2ActionChanged();
+
+    void R2ActionChanged();
+
+    void L2ShiftActionChanged();
+
+    void R2ShiftActionChanged();
+
 protected:
     void    _setDefaultCalibration  ();
     void    _saveSettings           ();
@@ -252,6 +294,12 @@ private:
 
     // Override from QThread
     virtual void run();
+
+    void _setPreviousR2(bool newPreviousR2);
+
+    void _setPreviousL2(bool newPreviousL2);
+
+    const QString _mapTextIntoAction(const QString &text);
 
 protected:
 
@@ -353,6 +401,26 @@ private:
     static const char* _buttonActionGimbalCenter;
     static const char* _buttonActionEmergencyStop;
 
+    bool m_currentR2 = false;
+
+    bool m_currentL2 = false;
+
+    bool m_previousR2 = false;
+
+    bool m_previousL2 = false;
+
+    QString m_L2Action;
+
+    QString m_R2Action;
+
+    QList<int> m_shiftIndexes;
+    bool m_shiftPressed = false;
+    QString m_L2ShiftAction;
+
+    QString m_R2ShiftAction;
+
 private slots:
     void _activeVehicleChanged(Vehicle* activeVehicle);
+    void _handleR2(bool currentR2, bool previousR2);
+    void _handleL2(bool currentL2, bool previousL2);
 };
