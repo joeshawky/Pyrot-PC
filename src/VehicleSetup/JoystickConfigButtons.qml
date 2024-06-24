@@ -116,6 +116,11 @@ ColumnLayout {
         width:      parent.width
         visible:    globals.activeVehicle.supportsJSButton
         spacing:    ScreenTools.defaultFontPixelHeight / 3
+        property string parameterName: "BTN0_FUNCTION";
+        property Fact parameterFact: controller.getParameterFact(-1, parameterName)
+        property var parameterFactList: parameterFact ? parameterFact.enumStrings : null
+
+
         Row {
             spacing: ScreenTools.defaultFontPixelWidth
             QGCLabel {
@@ -186,6 +191,112 @@ ColumnLayout {
                     width:                  ScreenTools.defaultFontPixelWidth * 15
                     visible:                !hasFirmwareSupport
                     anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+        }
+
+
+        Row {
+            id: l2Button
+            spacing: ScreenTools.defaultFontPixelWidth
+            visible: globals.activeVehicle.supportsJSButton
+
+            property bool pressed: _activeJoystick.currentL2
+
+
+            Rectangle {
+                anchors.verticalCenter:     parent.verticalCenter
+                width:                      ScreenTools.defaultFontPixelHeight * 1.5
+                height:                     width
+                border.width:               1
+                border.color:               qgcPal.text
+                color:                      l2Button.pressed ? qgcPal.buttonHighlight : qgcPal.button
+
+
+                QGCLabel {
+                    anchors.fill:           parent
+                    color:                  l2Button.pressed ? qgcPal.buttonHighlightText : qgcPal.buttonText
+                    horizontalAlignment:    Text.AlignHCenter
+                    verticalAlignment:      Text.AlignVCenter
+                    text:                   "L2"
+                }
+            }
+
+            QGCComboBox {
+                width:          ScreenTools.defaultFontPixelWidth * 15
+                sizeToContents: true
+                property bool indexModel: true  ///< true: model must be specifed, selected index is fact value, false: use enum meta data
+
+                model: buttonCol.parameterFactList
+                currentIndex: buttonCol.parameterFactList.indexOf(_activeJoystick.L2Action)
+
+                onActivated: {
+                    _activeJoystick.L2Action = buttonCol.parameterFactList[currentIndex];
+                }
+
+            }
+
+            QGCComboBox {
+                width:          ScreenTools.defaultFontPixelWidth * 15
+                sizeToContents: true
+                property bool indexModel: true  ///< true: model must be specifed, selected index is fact value, false: use enum meta data
+
+                model: buttonCol.parameterFactList
+                currentIndex: buttonCol.parameterFactList.indexOf(_activeJoystick.L2ShiftAction)
+
+                onActivated: {
+                    _activeJoystick.L2ShiftAction = buttonCol.parameterFactList[currentIndex];
+                }
+            }
+        }
+        Row {
+            id: r2Button
+            spacing: ScreenTools.defaultFontPixelWidth
+            visible: globals.activeVehicle.supportsJSButton
+
+            property bool pressed: _activeJoystick.currentR2
+
+            Rectangle {
+                anchors.verticalCenter:     parent.verticalCenter
+                width:                      ScreenTools.defaultFontPixelHeight * 1.5
+                height:                     width
+                border.width:               1
+                border.color:               qgcPal.text
+                color:                      r2Button.pressed ? qgcPal.buttonHighlight : qgcPal.button
+
+
+                QGCLabel {
+                    anchors.fill:           parent
+                    color:                  r2Button.pressed ? qgcPal.buttonHighlightText : qgcPal.buttonText
+                    horizontalAlignment:    Text.AlignHCenter
+                    verticalAlignment:      Text.AlignVCenter
+                    text:                   "R2"
+                }
+            }
+
+            QGCComboBox {
+                width:          ScreenTools.defaultFontPixelWidth * 15
+                sizeToContents: true
+                property bool indexModel: true  ///< true: model must be specifed, selected index is fact value, false: use enum meta data
+
+                model: buttonCol.parameterFactList
+                currentIndex: buttonCol.parameterFactList.indexOf(_activeJoystick.R2Action)
+
+                onActivated: {
+                    _activeJoystick.R2Action = buttonCol.parameterFactList[currentIndex];
+                }
+            }
+
+            QGCComboBox {
+                width:          ScreenTools.defaultFontPixelWidth * 15
+                sizeToContents: true
+                property bool indexModel: true  ///< true: model must be specifed, selected index is fact value, false: use enum meta data
+
+                model: buttonCol.parameterFactList
+                currentIndex: buttonCol.parameterFactList.indexOf(_activeJoystick.R2ShiftAction)
+
+                onActivated: {
+                    _activeJoystick.R2ShiftAction = buttonCol.parameterFactList[currentIndex];
                 }
             }
         }

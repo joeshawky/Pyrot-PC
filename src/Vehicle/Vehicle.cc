@@ -508,6 +508,11 @@ Vehicle::~Vehicle()
 #endif
 }
 
+void Vehicle::textToSpeech(const QString &text)
+{
+    _say(text);
+}
+
 void Vehicle::prepareDelete()
 {
     if(_cameraManager) {
@@ -2058,7 +2063,7 @@ bool Vehicle::flightModeSetAvailable()
 
 QStringList Vehicle::flightModes()
 {
-    return _firmwarePlugin->flightModes(this);
+     return _firmwarePlugin->flightModes(this);
 }
 
 QStringList Vehicle::extraJoystickFlightModes()
@@ -4020,7 +4025,10 @@ void Vehicle::triggerSimpleCamera()
                    1.0);                        // trigger camera
 }
 
-void Vehicle::sayWelcome(void)
+void Vehicle::setLoadCustomAddedLentaComponents(bool newLoadCustomAddedLentaComponents)
 {
-    _say(tr("Welcome lenta marine"));
+    if (_loadCustomAddedLentaComponents == newLoadCustomAddedLentaComponents)
+        return;
+    _loadCustomAddedLentaComponents = newLoadCustomAddedLentaComponents;
+    emit loadCustomAddedLentaComponentsChanged();
 }

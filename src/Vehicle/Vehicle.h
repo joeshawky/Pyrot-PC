@@ -260,6 +260,8 @@ public:
     // Lenta marine custom parameters
     Q_PROPERTY(bool loadCustomAddedLentaComponents READ loadCustomAddedLentaComponents WRITE setLoadCustomAddedLentaComponents NOTIFY loadCustomAddedLentaComponentsChanged)
 
+    Q_INVOKABLE void textToSpeech(const QString &text);
+
     // The following properties relate to Orbit status
     Q_PROPERTY(bool             orbitActive     READ orbitActive        NOTIFY orbitActiveChanged)
     Q_PROPERTY(QGCMapCircle*    orbitMapCircle  READ orbitMapCircle     CONSTANT)
@@ -440,7 +442,6 @@ public:
     Q_INVOKABLE void flashBootloader();
 #endif
 
-    Q_INVOKABLE void sayWelcome(void);
     
     bool    isInitialConnectComplete() const;
     bool    guidedModeSupported     () const;
@@ -838,14 +839,7 @@ public:
     void setEventsMetadata(uint8_t compid, const QString& metadataJsonFileName, const QString& translationJsonFileName);
     void setActuatorsMetadata(uint8_t compid, const QString& metadataJsonFileName, const QString& translationJsonFileName);
 
-    void setLoadCustomAddedLentaComponents(bool loadCustomAddedLentaComponents){
-        if(loadCustomAddedLentaComponents == _loadCustomAddedLentaComponents){
-            return;
-        }
-
-        _loadCustomAddedLentaComponents = loadCustomAddedLentaComponents;
-        emit loadCustomAddedLentaComponentsChanged();
-    }
+    void setLoadCustomAddedLentaComponents(bool newLoadCustomAddedLentaComponents);
 
 public slots:
     void setVtolInFwdFlight                 (bool vtolInFwdFlight);
