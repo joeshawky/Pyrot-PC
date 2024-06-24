@@ -8,6 +8,7 @@
 #include "QGCApplication.h"
 #include "QGCCameraManager.h"
 #include "JoystickManager.h"
+#include "VideoManager.h"
 
 QGC_LOGGING_CATEGORY(CameraManagerLog, "CameraManagerLog")
 
@@ -419,9 +420,12 @@ QGCCameraManager::_activeJoystickChanged(Joystick* joystick)
 void
 QGCCameraManager::_triggerCamera()
 {
+    VideoManager* vm = qgcApp()->toolbox()->videoManager();
+    vm->grabImage();
+
     QGCCameraControl* pCamera = currentCameraInstance();
     if(pCamera) {
-        pCamera->takePhoto();
+       pCamera->takePhoto();
     }
 }
 
@@ -449,6 +453,13 @@ QGCCameraManager::_stopVideoRecording()
 void
 QGCCameraManager::_toggleVideoRecording()
 {
+
+    VideoManager* vm = qgcApp()->toolbox()->videoManager();
+    if (vm->recording())
+        vm->stopRecording();
+    else
+        vm->startRecording();
+
     QGCCameraControl* pCamera = currentCameraInstance();
     if(pCamera) {
         pCamera->toggleVideo();
