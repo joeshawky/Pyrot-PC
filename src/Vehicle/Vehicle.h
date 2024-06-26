@@ -841,6 +841,8 @@ public:
 
     void setLoadCustomAddedLentaComponents(bool newLoadCustomAddedLentaComponents);
 
+    void setServo(int servoNumber, float pwmValue);
+
 public slots:
     void setVtolInFwdFlight                 (bool vtolInFwdFlight);
     void _offlineFirmwareTypeSettingChanged (QVariant varFirmwareType); // Should only be used by MissionControler to set firmware from Plan file
@@ -953,7 +955,6 @@ signals:
     void initialConnectComplete         ();
 
     void sensorsParametersResetAck      (bool success);
-
 private slots:
     void _mavlinkMessageReceived            (LinkInterface* link, mavlink_message_t message);
     void _sendMessageMultipleNext           ();
