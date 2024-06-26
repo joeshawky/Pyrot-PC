@@ -400,6 +400,12 @@ private:
     static const char* _buttonActionGimbalRight;
     static const char* _buttonActionGimbalCenter;
     static const char* _buttonActionEmergencyStop;
+    static const char* _buttonActionLightsOneBrighter;
+    static const char* _buttonActionLightsTwoBrighter;
+    static const char* _buttonActionLightsOneDimmer;
+    static const char* _buttonActionLightsTwoDimmer;
+    static const char* _buttonActionLightsOneCycle;
+    static const char* _buttonActionLightsTwoCycle;
 
     bool m_currentR2 = false;
 
@@ -418,6 +424,23 @@ private:
     QString m_L2ShiftAction;
 
     QString m_R2ShiftAction;
+
+    // void lightsBrighter(int lightChannel);
+    // void lightsDimmer(int lightChannel);
+
+    typedef enum {
+        brighter,
+        dimmer,
+        cycle
+    } lightMode_t;
+
+    void handleLights(int lightChannel, lightMode_t mode);
+
+    void lightsBrighter(int channelNumber, int mappedValue, int lightMaxValue);
+
+    void lightsDimmer(int channelNumber, int mappedValue, int lightMaxValue);
+
+    bool m_lightIncreasing = true;
 
 private slots:
     void _activeVehicleChanged(Vehicle* activeVehicle);

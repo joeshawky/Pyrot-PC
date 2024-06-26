@@ -4032,3 +4032,15 @@ void Vehicle::setLoadCustomAddedLentaComponents(bool newLoadCustomAddedLentaComp
     _loadCustomAddedLentaComponents = newLoadCustomAddedLentaComponents;
     emit loadCustomAddedLentaComponentsChanged();
 }
+
+void Vehicle::setServo(int servoNumber, float pwmValue)
+{
+    // qInfo() << "pwmValue : " << pwmValue;
+
+    sendMavCommand(_defaultComponentId,
+                   MAV_CMD_DO_SET_SERVO,
+                   false,
+                   servoNumber,
+                   pwmValue
+    );
+}

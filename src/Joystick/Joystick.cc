@@ -66,6 +66,12 @@ const char* Joystick::_buttonActionGimbalLeft =         QT_TR_NOOP("Gimbal Left"
 const char* Joystick::_buttonActionGimbalRight =        QT_TR_NOOP("Gimbal Right");
 const char* Joystick::_buttonActionGimbalCenter =       QT_TR_NOOP("Gimbal Center");
 const char* Joystick::_buttonActionEmergencyStop =      QT_TR_NOOP("Emergency Stop");
+const char* Joystick::_buttonActionLightsOneBrighter =  QT_TR_NOOP("lights1_brighter");
+const char* Joystick::_buttonActionLightsTwoBrighter =  QT_TR_NOOP("lights2_brighter");
+const char* Joystick::_buttonActionLightsOneDimmer =    QT_TR_NOOP("lights1_dimmer");
+const char* Joystick::_buttonActionLightsTwoDimmer =    QT_TR_NOOP("lights2_dimmer");
+const char* Joystick::_buttonActionLightsOneCycle =     QT_TR_NOOP("lights1_cycle");
+const char* Joystick::_buttonActionLightsTwoCycle =     QT_TR_NOOP("lights2_cycle");
 
 const char* Joystick::_rgFunctionSettingsKey[Joystick::maxFunction] = {
     "RollAxis",
@@ -108,6 +114,10 @@ Joystick::Joystick(const QString& name, int axisCount, int buttonCount, int hatC
     , _multiVehicleManager(multiVehicleManager)
     , m_L2Action("camera_trigger")
     , m_R2Action("camera_source_toggle")
+    // , m_L2Action("lights1_dimmer")
+    // , m_R2Action("lights1_brighter")
+    // , m_L2Action("gain_inc")
+    // , m_R2Action("gain_dec")
     , m_L2ShiftAction("Disabled")
     , m_R2ShiftAction("Disabled")
 {
@@ -131,6 +141,19 @@ Joystick::Joystick(const QString& name, int axisCount, int buttonCount, int hatC
 
     connect(this, &Joystick::calibratedChanged, [this](bool calibrated){
         connect(_activeVehicle, &Vehicle::loadCustomAddedLentaComponentsChanged, [this]{
+
+            // QStringList parameters = _activeVehicle->parameterManager()->getParameter(-1, "BTN0_FUNCTION")->enumStrings();
+            // QStringList mappedParameters;
+
+            // for(auto parameter : parameters){
+            //     auto mapped = _mapTextIntoAction(parameter);
+            //     mappedParameters.append(mapped);
+            //     // qInfo() << "parameter: " << parameter;
+            // }
+            // for(int i = 0; i < parameters.length(); i++){
+            //     qInfo() << "parameter: " << parameters[i] << ", mapped: " << mappedParameters[i];
+            // }
+
             bool parametersReady = _activeVehicle->readyToFlyAvailable() && !_activeVehicle->vehicleLinkManager()->communicationLost();
             if (!parametersReady)
                 return;
@@ -572,6 +595,23 @@ const QString Joystick::_mapTextIntoAction(const QString &text)
             return "Position Hold";
 
         return flightModeAction;
+    }
+
+    bool isGimbal = text.contains("mount");
+    if (isGimbal){
+        QString lastPart = text.split('_', Qt::SkipEmptyParts).last();
+        if (lastPart == "center")
+            return "Gimball Center";
+        else if (lastPart == "down")
+            return "Gimbal Down";
+        else if (lastPart == "up")
+            return "Gimbal Up";
+        else if (lastPart == "left")
+            return "Gimbal Left";
+        else if (lastPart == "right")
+            return "Gimbal Right";
+        else
+            return "No Action";
     }
 
     return text;
@@ -1125,7 +1165,21 @@ void Joystick::_executeButtonAction(const QString& action, bool buttonDown)
         }
     } else if(action == _buttonActionEmergencyStop) {
       if(buttonDown) emit emergencyStop();
-    } else {
+    } else if(action == _buttonActionLightsOneBrighter){
+        if(buttonDown) handleLights(1, brighter);
+    }else if(action == _buttonActionLightsOneDimmer){
+        if(buttonDown) handleLights(1, dimmer);
+    }else if(action == _buttonActionLightsTwoBrighter){
+        if(buttonDown) handleLights(2, brighter);
+    }else if(action == _buttonActionLightsTwoDimmer){
+        if(buttonDown) handleLights(2, dimmer);
+    }else if(action == _buttonActionLightsOneCycle){
+        if(buttonDown) handleLights(1, cycle);
+    }else if(action == _buttonActionLightsTwoCycle){
+        if(buttonDown) handleLights(2, cycle);
+    }
+
+    else {
         if (buttonDown && _activeVehicle) {
             for (auto& item : _customMavCommands) {
                 if (action == item.name()) {
@@ -1135,6 +1189,79 @@ void Joystick::_executeButtonAction(const QString& action, bool buttonDown)
             }
         }
         qCDebug(JoystickLog) << "_buttonAction unknown action:" << action;
+    }
+}
+
+
+void Joystick::lightsBrighter(int channelNumber, int mappedValue, int lightMaxValue)
+{
+    if (mappedValue > lightMaxValue)
+        mappedValue = lightMaxValue;
+
+    _activeVehicle->setServo(channelNumber, mappedValue);
+
+    if (mappedValue == lightMaxValue)
+        m_lightIncreasing = false;
+    else
+        m_lightIncreasing = true;
+}
+
+void Joystick::lightsDimmer(int channelNumber, int mappedValue, int lightMinValue)
+{
+    if (mappedValue < lightMinValue)
+        mappedValue = lightMinValue;
+
+    _activeVehicle->setServo(channelNumber, mappedValue);
+
+    if (mappedValue == lightMinValue)
+        m_lightIncreasing = true;
+    else
+        m_lightIncreasing = false;
+}
+
+void Joystick::handleLights(int lightChannel, lightMode_t mode)
+{
+    //lights 1 = RC9
+    //lights 2 = RC10
+
+    int channelNumber;
+
+    if (lightChannel == 1)
+        channelNumber = 9;
+    else if (lightChannel == 2)
+        channelNumber = 10;
+
+
+    int minValue = _activeVehicle->parameterManager()->getParameter(-1, QString("RC%1_MIN").arg(channelNumber))->rawValueString().toInt();
+    int maxValue = _activeVehicle->parameterManager()->getParameter(-1, QString("RC%1_MAX").arg(channelNumber))->rawValueString().toInt();
+    int range = (maxValue - minValue);
+
+    float stepSize = ceil(100.0 / _activeVehicle->parameterManager()->getParameter(-1, "JS_LIGHTS_STEPS")->rawValueString().toFloat());
+    float lightValuePercentage = _activeVehicle->getFact(QString("apmSubInfo.lights%1").arg(lightChannel))->rawValueString().toFloat();
+
+
+    if (mode == brighter){
+        // int newMappedValue = range * lightValuePercentage + minValue + stepSize;
+        int mappedValue = ((lightValuePercentage + stepSize) / 100.0) * range + minValue;
+        lightsBrighter(channelNumber, mappedValue, maxValue);
+        return;
+
+    }else if (mode == dimmer){
+        // int newMappedValue = range * lightValuePercentage + minValue - stepSize;
+        int mappedValue = ((lightValuePercentage - stepSize) / 100.0) * range + minValue;
+        lightsDimmer(channelNumber, mappedValue, minValue);
+        return;
+
+    }
+
+    if (m_lightIncreasing){
+        int mappedValue = ((lightValuePercentage + stepSize) / 100.0) * range + minValue;
+        lightsBrighter(channelNumber, mappedValue, maxValue);
+        return;
+    }else {
+        int mappedValue = ((lightValuePercentage - stepSize) / 100.0) * range + minValue;
+        lightsDimmer(channelNumber, mappedValue, minValue);
+        return;
     }
 }
 
@@ -1281,6 +1408,7 @@ void Joystick::_handleR2(bool currentR2, bool previousR2)
         _executeButtonAction(mappedAction, true);
     }else{
         const QString mappedAction = _mapTextIntoAction(m_R2Action);
+        // qInfo() << "r2, action: " << m_R2Action << "mappedaction: " << mappedAction;
         _executeButtonAction(mappedAction, true);
     }
 
@@ -1304,6 +1432,7 @@ void Joystick::_handleL2(bool currentL2, bool previousL2)
         _executeButtonAction(mappedAction, true);
     }else{
         const QString mappedAction = _mapTextIntoAction(m_L2Action);
+        // qInfo() << "l2, action: " << m_R2Action << "mappedaction: " << mappedAction;
         _executeButtonAction(mappedAction, true);
     }
 
