@@ -1,7 +1,7 @@
 # **Pyrot V1.3**
 
 # New features
-- [x] Added backebd logic and frontend UI for L2 & R2 buttons.
+- [x] Added backend logic and frontend UI for L2 & R2 buttons.
 
   
 # Old features
