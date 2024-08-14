@@ -8,7 +8,7 @@
   
 # Old features
 - [x] Remove video control block
-- [x] Remove parameters indicator block
+- [x] Remove the parameters indicator block on the bottom of the screen
 - [x] Add depth, roll, pitch, heading bar
 - [x] Add toolbar to the left of the screen, toolbar includes: Joystick, Video record & Photo capture buttons, Notification icon
 - [x] Change all fonts to "Comic Sans MS"

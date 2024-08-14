@@ -108,6 +108,7 @@ Row {
         return (temperatureTwo.value) ? temperatureTwo.value.toFixed(1) : "0"
     }
 
+
     function getLightsOneValue(){
         let lightsMinimum = Number(controller.getParameterFact(-1, "RC9_MIN").value)
         let lightsMaximum = Number(controller.getParameterFact(-1, "RC9_MAX").value)
@@ -138,6 +139,8 @@ Row {
             return qgcPal.colorGreen;
 
         return "red"
+
+
     }
 
     function normalize(minimumNum, maximumNum, input){
