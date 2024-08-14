@@ -1,6 +1,8 @@
 # **Pyrot V1.3**
 
 # New features
+- [x] Configured subtitle file to include time next to date, and include company name and ship name once the user fills them from application settings
+- [x] Implemented audio input while a video is being taken, this gets enabled through application settings
 - [x] Added backend logic and frontend UI for L2 & R2 buttons.
 
   

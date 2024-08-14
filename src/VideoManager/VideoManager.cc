@@ -162,8 +162,23 @@ VideoManager::setToolbox(QGCToolbox *toolbox)
         emit recordingChanged();
     });
 
+    connect(_videoReceiver[0], &VideoReceiver::recordingChanged, this, [this](bool active){
+        if (!active) {
+            _audioManager.StopRecording();
+        }
+        emit recordingChanged();
+    });
+
     connect(_videoReceiver[0], &VideoReceiver::recordingStarted, this, [this](){
         _subtitleWriter.startCapturingTelemetry(_videoFile);
+    });
+
+
+    connect(_videoReceiver[0], &VideoReceiver::recordingStarted, this, [this](){
+        QString captureAudioInput = qgcApp()->toolbox()->settingsManager()->audioSettings()->captureAudioInput()->rawValueString();
+        bool capture = captureAudioInput == "true" ? true : false;
+        if (capture)
+            _audioManager.StartRecording(_videoFile);
     });
 
     connect(_videoReceiver[0], &VideoReceiver::videoSizeChanged, this, [this](QSize size){

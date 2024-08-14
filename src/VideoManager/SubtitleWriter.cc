@@ -24,6 +24,9 @@
 #include <QString>
 #include <QDate>
 
+#include "SettingsManager.h"
+#include "SubtitleSettings.h"
+
 QGC_LOGGING_CATEGORY(SubtitleWriterLog, "SubtitleWriterLog")
 
 const int SubtitleWriter::_sampleRate = 1; // Sample rate in Hz for getting telemetry data, most players do weird stuff when > 1Hz
@@ -56,15 +59,17 @@ void SubtitleWriter::startCapturingTelemetry(const QString& videoFile)
 
     _facts.clear();
 
-    _facts += vehicle->getFact("apmSubInfo.lights1");
-    _facts += vehicle->getFact("apmSubInfo.lights2");
+    // _facts += vehicle->getFact("apmSubInfo.lights1");
+    // _facts += vehicle->getFact("apmSubInfo.lights2");
     _facts += vehicle->getFact("FlightTime");
-    _facts += vehicle->getFact("temperature.temperature2");
-    _facts += vehicle->getFact("apmSubInfo.cameraTilt");
-    _facts += vehicle->getFact("apmSubInfo.pilotGain");
-    _facts += vehicle->getFact("apmSubInfo.tetherTurns");
+    // _facts += vehicle->getFact("apmSubInfo.cameraTilt");
+    // _facts += vehicle->getFact("apmSubInfo.pilotGain");
+    // _facts += vehicle->getFact("apmSubInfo.tetherTurns");
     _facts += vehicle->altitudeRelative();
-    _facts += vehicle->getFact("apmSubInfo.rangefinderDistance");
+    // _facts += vehicle->getFact("apmSubInfo.rangefinderDistance");
+    _facts += vehicle->getFact("temperature.temperature2");
+
+    _facts += vehicle->pitch();
     _facts += vehicle->roll();
 
 //    delete vehicle;
@@ -184,7 +189,29 @@ void SubtitleWriter::_captureTelemetry()
     stringColumns << QStringLiteral("Dialogue: 0,%1,%2,Default,,0,0,0,,{\\pos(10,35)}%3\n")
         .arg(start.toString("H:mm:ss.zzz").chopped(2))
         .arg(end.toString("H:mm:ss.zzz").chopped(2))
-        .arg(QDateTime::currentDateTime().toString(QLocale::system().dateFormat(QLocale::ShortFormat)));
+        .arg(QDateTime::currentDateTime().toString(QLocale::system().dateTimeFormat(QLocale::ShortFormat)));
+
+    QString companyName = qgcApp()->toolbox()->settingsManager()->subtitleSettings()->companyName()->rawValue().toString();
+    QString shipName = qgcApp()->toolbox()->settingsManager()->subtitleSettings()->shipName()->rawValue().toString();
+
+    if (!shipName.simplified().isEmpty()){
+        stringColumns << QStringLiteral("Dialogue: 0,%1,%2,Default,,0,0,0,,{\\pos(10,70)}%3\n")
+            .arg(start.toString("H:mm:ss.zzz").chopped(2))
+            .arg(end.toString("H:mm:ss.zzz").chopped(2))
+            .arg(QString("Ship Name: " + shipName));
+    }
+
+
+    if (!companyName.simplified().isEmpty()){
+        stringColumns << QStringLiteral("Dialogue: 0,%1,%2,Default,,0,0,0,,{\\pos(%4,35)}%3\n")
+            .arg(start.toString("H:mm:ss.zzz").chopped(2))
+            .arg(end.toString("H:mm:ss.zzz").chopped(2))
+            .arg(QString("Company Name: " + companyName))
+            .arg(1920 - 300 - (companyName.length() * 15));
+    }
+
+
+
     // Write new data
     QTextStream stream(&_file);
     for (const auto& i : stringColumns) {

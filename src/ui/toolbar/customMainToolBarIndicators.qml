@@ -9,6 +9,7 @@ import QGroundControl.FactControls  1.0
 import QGroundControl.Controls      1.0
 import QtQuick.Controls 1.2
 
+import QGroundControl.Controllers   1.0
 
 Row {
     id:                 indicatorRow
@@ -22,11 +23,65 @@ Row {
 
     FactPanelController { id: controller; }
 
+
+
     property var  _activeVehicle:           QGroundControl.multiVehicleManager.activeVehicle
     property real _toolIndicatorMargins:    ScreenTools.defaultFontPixelHeight * 0.66
 
     property Fact lightsOne: controller.vehicle.getFact("apmSubInfo.lights1")
+    property int lightsOnePwm: Number(controller.getParameterFact(-1, "RC9_MIN").value)
+
     property Fact lightsTwo: controller.vehicle.getFact("apmSubInfo.lights2")
+    property int lightsTwoPwm: Number(controller.getParameterFact(-1, "RC10_MIN").value)
+    RCChannelMonitorController{
+        id: rcChannelController
+        onChannelRCValueChanged: {
+            // console.log(`channel: ${channel}, rcValue: ${rcValue}\n`)
+
+            if (channel === 8){ //RCIN9 or Lights1
+                indicatorRow.lightsOnePwm = rcValue
+            }else if (channel === 9){
+                indicatorRow.lightsTwoPwm = rcValue
+            }
+        }
+        // Component.onCompleted: {
+        //     console.log("Component completed! ")
+        // }
+    }
+
+    Timer{
+        interval: 500
+        running: true
+        repeat: true
+        onTriggered: {
+            // let value = rcChannelController.vehicle.
+        }
+    }
+
+    property bool lightsCombined: {
+        let rcFunctions = [];
+        for(let index = 5; index <= 14; index++){
+            let rcIndexFunction = controller.getParameterFact(-1, `SERVO${index}_FUNCTION`).value;
+            // rcFunctions.
+            rcFunctions.push(rcIndexFunction);
+        }
+
+
+        let found = {};
+        for (let i = 0; i < rcFunctions.length; i++) {
+            if (rcFunctions[i] === 0)
+                continue
+
+            if (found[rcFunctions[i]]) {
+                return true;
+            }
+
+            found[rcFunctions[i]] = true;
+
+        }
+
+        return false;
+    }
 
     property Fact flightTime: controller.vehicle.getFact("FlightTime")
     property Fact temperatureTwo: controller.vehicle.getFact("temperature.temperature2")
@@ -53,12 +108,43 @@ Row {
         return (temperatureTwo.value) ? temperatureTwo.value.toFixed(1) : "0"
     }
 
-    function getLightsColor(lightsVal){
-        return Math.round(indicatorRow.normalize(-137, 138, lightsVal)) > 0 ? qgcPal.colorGreen : "red"
+
+    function getLightsOneValue(){
+        let lightsMinimum = Number(controller.getParameterFact(-1, "RC9_MIN").value)
+        let lightsMaximum = Number(controller.getParameterFact(-1, "RC9_MAX").value)
+        let currentPwm = indicatorRow.lightsOnePwm
+        return Math.round(100.0 * (currentPwm - lightsMinimum) / (lightsMaximum - lightsMinimum))
+    }
+
+    function getLightsOneColor(){
+        // if (getLightsOneValue() > 0)
+        //     return qgcPal.colorGreen;
+
+        // return "red"
+        if (indicatorRow.normalize(-137, 175, indicatorRow.lightsOne.value) > 0)
+            return qgcPal.colorGreen;
+
+        return "red"
+    }
+
+    function getLightsTwoValue(){
+        let lightsMinimum = Number(controller.getParameterFact(-1, "RC10_MIN").value)
+        let lightsMaximum = Number(controller.getParameterFact(-1, "RC10_MAX").value)
+        let currentPwm = indicatorRow.lightsTwoPwm
+        return Math.round(100.0 * (currentPwm - lightsMinimum) / (lightsMaximum - lightsMinimum))
+    }
+
+    function getLightsTwoColor(){
+        if (getLightsTwoValue() > 0)
+            return qgcPal.colorGreen;
+
+        return "red"
+
+
     }
 
     function normalize(minimumNum, maximumNum, input){
-        return (input-minimumNum)/(maximumNum-minimumNum) * 100
+        return Math.round((input-minimumNum)/(maximumNum-minimumNum) * 100)
     }
 
     Timer{
@@ -288,11 +374,32 @@ Row {
                     left: parent.left
                 }
                 color: "white";
-                // text: `${Number(indicatorRow.lightsOne.value)-}% L1`;
-                text: `${Math.round(indicatorRow.normalize(-137, 138, Number(indicatorRow.lightsOne.value)))}% L1`
+                // text: indicatorRow.getLightsOneValue() + "% L1"
+                // text: {
+                //     let lightsMinimum = Number(controller.getParameterFact(-1, "RC9_MIN").value)
+                //     let lightsMaximum = Number(controller.getParameterFact(-1, "RC9_MAX").value)
+                //     let currentPwm = indicatorRow.lightsOnePwm
+                //     console.log("Entered text block")
+                //     return Math.round(100.0 * (currentPwm - lightsMinimum) / (lightsMaximum - lightsMinimum))
+                // }
+                text: indicatorRow.normalize(-137, 175, indicatorRow.lightsOne.value) + "% L1"
+
                 font.family:    ScreenTools.normalFontFamily
                 font.pointSize:     ScreenTools.defaultFontPointSize
             }
+
+
+            // Timer{
+            //     interval: 500
+            //     running: false
+            //     repeat: false
+            //     onTriggered:{
+            //         let lightsMinimum = Number(controller.getParameterFact(-1, "RC9_MIN").value)
+            //         let lightsMaximum = Number(controller.getParameterFact(-1, "RC9_MAX").value)
+            //         // rcChannelController.
+            //         // console.log(`min: ${lightsMinimum}, max: ${lightsMaximum}`);
+            //     }
+            // }
 
             Image{
                 anchors{
@@ -308,7 +415,8 @@ Row {
                  Rectangle{
                     anchors.fill: parent
                     opacity: 0.5
-                    color: indicatorRow.getLightsColor(indicatorRow.lightsOne.value)
+                    color: indicatorRow.getLightsOneColor()
+                    // color: indicatorRow.normalize(-137, 175, indicatorRow.lightsOne.value) > 0 ? ""
                     radius: width * 0.5
                 }
             }
@@ -322,6 +430,7 @@ Row {
 
     //L2
     Item{
+        visible: !indicatorRow.lightsCombined
         width: parent.itemWidth * 1.5
         height: parent.height
 
@@ -338,8 +447,7 @@ Row {
                     leftMargin: ScreenTools.defaultFontPixelWidth * 0.25
                 }
                 color: "white";
-                // text: `${indicatorRow.lightsTwo.value}% L2`;
-                text: `${Math.round(indicatorRow.normalize(-137, 138, Number(indicatorRow.lightsTwo.value)))}% L2`
+                text: indicatorRow.getLightsTwoValue() + "% L2"
                 font.family:    ScreenTools.normalFontFamily
                 font.pointSize:     ScreenTools.defaultFontPointSize
             }
@@ -359,7 +467,7 @@ Row {
                  Rectangle{
                      anchors.fill: parent
                      opacity: 0.5
-                     color: indicatorRow.getLightsColor(indicatorRow.lightsTwo.value)
+                     color: indicatorRow.getLightsTwoColor()
                      radius: width * 0.5
                  }
             }
