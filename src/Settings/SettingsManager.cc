@@ -29,6 +29,8 @@ SettingsManager::SettingsManager(QGCApplication* app, QGCToolbox* toolbox)
     , _offlineMapsSettings          (nullptr)
     , _firmwareUpgradeSettings      (nullptr)
     , _adsbVehicleManagerSettings   (nullptr)
+    , _subtitleSettings             (nullptr)
+    , _audioSettings                (nullptr)
 #if !defined(NO_ARDUPILOT_DIALECT)
     , _apmMavlinkStreamRateSettings (nullptr)
 #endif
@@ -54,6 +56,8 @@ void SettingsManager::setToolbox(QGCToolbox *toolbox)
     _offlineMapsSettings =          new OfflineMapsSettings         (this);
     _firmwareUpgradeSettings =      new FirmwareUpgradeSettings     (this);
     _adsbVehicleManagerSettings =   new ADSBVehicleManagerSettings  (this);
+    _subtitleSettings =             new SubtitleSettings            (this);
+    _audioSettings =                new AudioSettings               (this);
 #if !defined(NO_ARDUPILOT_DIALECT)
     _apmMavlinkStreamRateSettings = new APMMavlinkStreamRateSettings(this);
 #endif

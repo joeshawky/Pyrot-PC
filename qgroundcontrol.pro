@@ -257,7 +257,8 @@ QT += \
     widgets \
     xml \
     texttospeech \
-    core-private
+    core-private \
+    multimedia
 
 # Multimedia only used if QVC is enabled
 !contains (DEFINES, QGC_DISABLE_UVC) {
@@ -432,7 +433,10 @@ contains (DEFINES, QGC_ENABLE_PAIRING) {
 
 HEADERS += \
     src/QmlControls/QmlUnitsConversion.h \
+    src/Settings/AudioSettings.h \
+    src/Settings/SubtitleSettings.h \
     src/Vehicle/VehicleEscStatusFactGroup.h \
+    src/VideoManager/AudioManager.h \
     src/api/QGCCorePlugin.h \
     src/api/QGCOptions.h \
     src/api/QGCSettings.h \
@@ -445,7 +449,10 @@ contains (DEFINES, QGC_ENABLE_PAIRING) {
 }
 
 SOURCES += \
+    src/Settings/AudioSettings.cpp \
+    src/Settings/SubtitleSettings.cpp \
     src/Vehicle/VehicleEscStatusFactGroup.cc \
+    src/VideoManager/AudioManager.cpp \
     src/api/QGCCorePlugin.cc \
     src/api/QGCOptions.cc \
     src/api/QGCSettings.cc \
@@ -1530,7 +1537,7 @@ contains (CONFIG, QGC_DISABLE_INSTALLER_SETUP) {
 }
 
 DISTFILES += \
-    src/QmlControls/QGroundControl/Specific/qmldir
+    src/QmlControls/QGroundControl/Specific/qmldir \
 
 #
 # Steps for "install" target on Linux

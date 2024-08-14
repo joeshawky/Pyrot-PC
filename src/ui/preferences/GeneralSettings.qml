@@ -397,6 +397,93 @@ Rectangle {
                         }
                     }
 
+                    Item { width: 1; height: _margins; visible: subtitleSectionLabel.visible }
+                    QGCLabel {
+                        id:         subtitleSectionLabel
+                        text:       qsTr("Subtitle")
+                        visible:    _planViewSettings.visible
+                    }
+                    Rectangle {
+                        Layout.preferredHeight: subtitleSectionCol.height + (_margins * 2)
+                        Layout.preferredWidth:  subtitleSectionCol.width + (_margins * 2)
+                        color:                  qgcPal.windowShade
+                        visible:                subtitleSectionLabel.visible
+                        Layout.fillWidth:       true
+
+                        ColumnLayout {
+                            id:                         subtitleSectionCol
+                            anchors.margins:            _margins
+                            anchors.top:                parent.top
+                            anchors.horizontalCenter:   parent.horizontalCenter
+                            spacing:                    _margins
+
+                            GridLayout {
+                                columns:            2
+                                columnSpacing:      ScreenTools.defaultFontPixelWidth
+                                visible:            QGroundControl.settingsManager.subtitleSettings.visible
+
+                                QGCLabel { text: qsTr("Company Name") }
+                                FactTextField {
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    fact:                   QGroundControl.settingsManager.subtitleSettings.companyName
+                                }
+
+                                QGCLabel { text: qsTr("Ship Name") }
+                                FactTextField {
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    fact:                   QGroundControl.settingsManager.subtitleSettings.shipName
+                                }
+                            }
+                        }
+                    }
+
+                    Item { width: 1; height: _margins; visible: subtitleSectionLabel.visible }
+
+                    QGCLabel {
+                        id:         audioSectionLabel
+                        text:       qsTr("Audio")
+                        visible:    _planViewSettings.visible
+                    }
+                    Rectangle {
+                        Layout.preferredHeight: audioSectionCol.height + (_margins * 2)
+                        Layout.preferredWidth:  audioSectionCol.width + (_margins * 2)
+                        color:                  qgcPal.windowShade
+                        visible:                audioSectionLabel.visible
+                        Layout.fillWidth:       true
+
+                        ColumnLayout {
+                            id:                         audioSectionCol
+                            anchors.margins:            _margins
+                            anchors.top:                parent.top
+                            anchors.horizontalCenter:   parent.horizontalCenter
+                            spacing:                    _margins
+
+                            GridLayout {
+                                columns:            2
+                                columnSpacing:      ScreenTools.defaultFontPixelWidth
+                                visible:            QGroundControl.settingsManager.subtitleSettings.visible
+
+                                // QGCLabel { text: qsTr("Capture Audio (Microphone)") }
+                                // FactTextField {
+                                //     Layout.preferredWidth:  _comboFieldWidth
+                                //     fact:                   QGroundControl.settingsManager.subtitleSettings.companyName
+                                // }
+
+                                FactCheckBox {
+                                    text:   qsTr("Capture Audio (Microphone)")
+                                    fact:   QGroundControl.settingsManager.audioSettings.captureAudioInput
+                                }
+
+                                // QGCLabel { text: qsTr("Ship Name") }
+                                // FactTextField {
+                                //     Layout.preferredWidth:  _comboFieldWidth
+                                //     fact:                   QGroundControl.settingsManager.subtitleSettings.shipName
+                                // }
+                            }
+                        }
+                    }
+
+
                     Item { width: 1; height: _margins; visible: planViewSectionLabel.visible }
                     QGCLabel {
                         id:         planViewSectionLabel
