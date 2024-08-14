@@ -23,6 +23,7 @@
 #include "SubtitleWriter.h"
 
 #include "MultiVideoManager.h"
+#include "AudioManager.h"
 
 Q_DECLARE_LOGGING_CATEGORY(VideoManagerLog)
 
@@ -184,6 +185,7 @@ protected:
     QString                 _videoFile;
     QString                 _imageFile;
     SubtitleWriter          _subtitleWriter;
+    AudioManager            _audioManager;
     bool                    _isTaisync              = false;
     VideoReceiver*          _videoReceiver[2]       = { nullptr, nullptr };
     void*                   _videoSink[2]           = { nullptr, nullptr };
