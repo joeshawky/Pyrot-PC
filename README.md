@@ -1,4 +1,4 @@
-# **Pyrot V1.3**
+# **Pyrot V1.4**
 
 # New features
 - [x] Configured multiple camera stream window to display just one stream instead of three streams.
