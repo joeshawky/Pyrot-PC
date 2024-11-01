@@ -373,26 +373,26 @@ Rectangle {
                                     fact: _videoSettings.udpPort0
                                     visible: udpPort0Label.visible
                                 }
-                                QGCLabel {
-                                    id: udpPort1Label
-                                    text: qsTr("UDP Port 2")
-                                    visible: true
-                                }
-                                FactTextField {
-                                    Layout.preferredWidth: _comboFieldWidth
-                                    fact: _videoSettings.udpPort1
-                                    visible: udpPort1Label.visible
-                                }
-                                QGCLabel {
-                                    id: udpPort2Label
-                                    text: qsTr("UDP Port 3")
-                                    visible: true
-                                }
-                                FactTextField {
-                                    Layout.preferredWidth: _comboFieldWidth
-                                    fact: _videoSettings.udpPort2
-                                    visible: udpPort2Label.visible
-                                }
+                                // QGCLabel {
+                                //     id: udpPort1Label
+                                //     text: qsTr("UDP Port 2")
+                                //     visible: true
+                                // }
+                                // FactTextField {
+                                //     Layout.preferredWidth: _comboFieldWidth
+                                //     fact: _videoSettings.udpPort1
+                                //     visible: udpPort1Label.visible
+                                // }
+                                // QGCLabel {
+                                //     id: udpPort2Label
+                                //     text: qsTr("UDP Port 3")
+                                //     visible: true
+                                // }
+                                // FactTextField {
+                                //     Layout.preferredWidth: _comboFieldWidth
+                                //     fact: _videoSettings.udpPort2
+                                //     visible: udpPort2Label.visible
+                                // }
                             }
                         }
                     }
