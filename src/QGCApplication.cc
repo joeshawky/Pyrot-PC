@@ -549,7 +549,7 @@ bool QGCApplication::_initForNormalAppBoot()
     _qmlAppEngine = toolbox()->corePlugin()->createQmlApplicationEngine(this);
     toolbox()->corePlugin()->createRootWindow(_qmlAppEngine);
 
-    //    createMultiVideoWindow();
+    createMultiVideoWindow();
 
     // Image provider for PX4 Flow
     QQuickImageProvider* pImgProvider = dynamic_cast<QQuickImageProvider*>(qgcApp()->toolbox()->imageProvider());

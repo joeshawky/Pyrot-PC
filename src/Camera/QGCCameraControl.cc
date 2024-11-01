@@ -360,7 +360,6 @@ QGCCameraControl::toggleVideo()
 bool
 QGCCameraControl::takePhoto()
 {
-    qCDebug(CameraControlLog) << "takePhoto()";
     //-- Check if camera can capture photos or if it can capture it while in Video Mode
     if(!capturesPhotos()) {
         qCWarning(CameraControlLog) << "Camera does not handle image capture";

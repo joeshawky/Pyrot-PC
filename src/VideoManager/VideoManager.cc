@@ -170,15 +170,17 @@ VideoManager::setToolbox(QGCToolbox *toolbox)
     });
 
     connect(_videoReceiver[0], &VideoReceiver::recordingStarted, this, [this](){
-        _subtitleWriter.startCapturingTelemetry(_videoFile);
+        QString videoFile = _videoFile.remove("_CAM1");
+        _subtitleWriter.startCapturingTelemetry(videoFile);
     });
 
 
     connect(_videoReceiver[0], &VideoReceiver::recordingStarted, this, [this](){
         QString captureAudioInput = qgcApp()->toolbox()->settingsManager()->audioSettings()->captureAudioInput()->rawValueString();
         bool capture = captureAudioInput == "true" ? true : false;
+        QString videoFile = _videoFile.remove("_CAM1");
         if (capture)
-            _audioManager.StartRecording(_videoFile);
+            _audioManager.StartRecording(videoFile);
     });
 
     connect(_videoReceiver[0], &VideoReceiver::videoSizeChanged, this, [this](QSize size){
@@ -326,9 +328,22 @@ VideoManager::startRecording(const QString& videoFile)
         return;
     }
 
-    _videoFile = savePath + "/"
-            + (videoFile.isEmpty() ? QDateTime::currentDateTime().toString("yyyy-MM-dd_hh.mm.ss") : videoFile)
-            + ".";
+    QString currentDateTimeString = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh.mm.ss");
+
+    QString directoryPath = QStringLiteral("%1/%2").arg(savePath, currentDateTimeString);
+    QDir dir(directoryPath);
+        if (!dir.exists())
+            dir.mkpath(".");
+
+    // _videoFile = savePath + "/"
+    //              + (videoFile.isEmpty() ? currentDateTimeString : videoFile)
+    //              + "_CAM1.";
+
+
+    _videoFile = QStringLiteral("%1/%2").arg(directoryPath, (videoFile.isEmpty() ? currentDateTimeString : videoFile));
+    QString multiCamRecordingPath = _videoFile;
+    _videoFile += "_CAM1.";
+
     QString videoFile2 = _videoFile + "2." + ext;
     _videoFile += ext;
 
@@ -338,6 +353,10 @@ VideoManager::startRecording(const QString& videoFile)
     if (_videoReceiver[1] && _videoStarted[1]) {
         _videoReceiver[1]->startRecording(videoFile2, fileFormat);
     }
+
+    // QString multipleVideoFiles = "asd";
+
+    startMultiCamRecording(multiCamRecordingPath);
 
 #else
     Q_UNUSED(videoFile)
@@ -357,6 +376,7 @@ VideoManager::stopRecording()
             _videoReceiver[i]->stopRecording();
         }
     }
+    stopMultiCamRecording();
 #endif
 }
 
@@ -383,19 +403,23 @@ VideoManager::grabImage(const QString& imageFile)
         return;
     }
 
+    QString currentDateTime = QDateTime::currentDateTime().toString("yyyy-MM-dd_hh.mm.ss.zzz");
+    QString photoSavePath = qgcApp()->toolbox()->settingsManager()->appSettings()->photoSavePath();
+    QString tempImagePath = QStringLiteral("%1/%2").arg(photoSavePath, currentDateTime);
+
     if (imageFile.isEmpty()) {
-        _imageFile = qgcApp()->toolbox()->settingsManager()->appSettings()->photoSavePath();
-        _imageFile += + "/" + QDateTime::currentDateTime().toString("yyyy-MM-dd_hh.mm.ss.zzz") + ".jpg";
+        _imageFile = photoSavePath;
+        _imageFile += + "/" + currentDateTime + "_CAM1" + ".jpg";
     } else {
         _imageFile = imageFile;
     }
 
     emit imageFileChanged();
-
-    _videoReceiver[0]->takeScreenshot(_imageFile);
+    // _videoReceiver[0]->takeScreenshot(_imageFile);
 #else
     Q_UNUSED(imageFile)
 #endif
+
 }
 
 //-----------------------------------------------------------------------------
@@ -638,7 +662,7 @@ VideoManager::_initVideo()
         qCDebug(VideoManagerLog) << "thermal video receiver disabled";
     }
 
-//    _multiVideoManager->init();
+   _multiVideoManager->init();
 #endif
 }
 

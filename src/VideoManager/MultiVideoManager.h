@@ -30,6 +30,8 @@ public:
     void startRecording              (const QString& videoFile = QString());
     void stopRecording               ();
 
+    void grabImage(const QString& imageFile);
+
     virtual void setToolbox (QGCToolbox *toolbox);
 
 private:
