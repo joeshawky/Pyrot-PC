@@ -56,6 +56,7 @@
         <file alias="waypoint.svg">resources/waypoint.svg</file>
         <file>resources/icons/qgroundcontrol.ico</file>
         <file alias="NoVideoLentaBackground.jpg">resources/NoVideoLentaBackground.jpg</file>
+        <file alias="talay-logo-black-bg.jpg">resources/talay-logo-black-bg.jpg</file>
     </qresource>
     <qresource prefix="/res/firmware">
         <file alias="3drradio.png">resources/firmware/3drradio.png</file>

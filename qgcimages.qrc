@@ -204,6 +204,6 @@
         <file alias="pitchBar.svg">src/FlightMap/Images/pitchBar.svg</file>
         <file alias="depthBar.svg">src/FlightMap/Images/depthBar.svg</file>
         <file alias="lentaCrossHair.svg">src/FlightMap/Images/lentaCrossHair.svg</file>
-
+        <file alias="talayLogo.png">src/ui/toolbar/Images/talay-logo.png</file>
     </qresource>
 </RCC>

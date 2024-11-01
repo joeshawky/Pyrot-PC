@@ -330,7 +330,7 @@ Item {
             } else if (_paramsLoaded && !_toggle_btns_initialized && !_communicationLost){
                 _activeVehicle.loadCustomAddedLentaComponents = true;
                 _toggle_btns_initialized = true;
-                _activeVehicle.textToSpeech("Welcome lenta marine");
+                // _activeVehicle.textToSpeech("Welcome lenta marine");
             }
         }
     }

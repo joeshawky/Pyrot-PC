@@ -56,7 +56,8 @@ Item {
     // Rectangle {
         id:             noVideo
         anchors.fill:   parent
-        source:         "/res/NoVideoLentaBackground.jpg"
+        // source:         "/res/NoVideoLentaBackground.jpg"
+        source: "/res/talay-logo-black-bg.jpg";
         // source:         "/res/NoVideoBackground.jpg"
         fillMode:       Image.PreserveAspectCrop
         visible:        !(QGroundControl.videoManager.decoding)

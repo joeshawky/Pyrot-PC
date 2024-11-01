@@ -27,7 +27,7 @@ message(Qt version $$[QT_VERSION])
 
 include(QGCCommon.pri)
 
-TARGET   = PyrotV1.3
+TARGET   = Rov-Control-Program
 TEMPLATE = app
 QGCROOT  = $$PWD
 
@@ -49,7 +49,7 @@ LinuxBuild {
 }
 
 WindowsBuild {
-    RC_ICONS = resources/icons/wave.ico
+    RC_ICONS = resources/icons/talay-logo.ico
     CONFIG += resources_big
 }
 
@@ -57,18 +57,19 @@ WindowsBuild {
 # Branding
 #
 
-QGC_APP_NAME        = "PyrotV1.3"
+QGC_APP_NAME        = "Rov-Control-Program"
 # QGC_ORG_NAME        = "QGroundControl.org"
 # QGC_ORG_DOMAIN      = "org.qgroundcontrol"
-QGC_ORG_NAME        = "PyrotName"
-QGC_ORG_DOMAIN      = "PyrotDomain"
-QGC_APP_DESCRIPTION = "Open source ground control app provided by QGroundControl dev team and the Lenta Marine dev team"
+QGC_ORG_NAME        = "Rov-Control-Program"
+QGC_ORG_DOMAIN      = "Rov-Control-Program"
+QGC_APP_DESCRIPTION = "Open source ground control app"
 
 QGC_APP_COPYRIGHT   = "Copyright (C) 2019 QGroundControl Development Team. All rights reserved."
 
 WindowsBuild {
     QGC_INSTALLER_SCRIPT        = "$$SOURCE_DIR\\deploy\\windows\\nullsoft_installer.nsi"
-    QGC_INSTALLER_ICON          = "$$SOURCE_DIR\\deploy\\windows\\PyrotLogo.ico"
+    # QGC_INSTALLER_ICON          = "$$SOURCE_DIR\\deploy\\windows\\PyrotLogo.ico"
+    QGC_INSTALLER_ICON          = "$$SOURCE_DIR\\deploy\\windows\\talay-logo.ico"
     QGC_INSTALLER_HEADER_BITMAP = "$$SOURCE_DIR\\deploy\\windows\\installheader.bmp"
     QGC_INSTALLER_DRIVER_MSI    = "$$SOURCE_DIR\\deploy\\windows\\driver.msi"
 }
@@ -358,9 +359,9 @@ CustomBuild {
         RESOURCES += $$PWD/resources/InstrumentValueIcons/InstrumentValueIcons.qrc
     }
 } else {
-    DEFINES += QGC_APPLICATION_NAME=\"\\\"PyrotV1.3\\\"\"
-    DEFINES += QGC_ORG_NAME=\"\\\"PyrotName\\\"\"
-    DEFINES += QGC_ORG_DOMAIN=\"\\\"PyrotDomain\\\"\"
+    DEFINES += QGC_APPLICATION_NAME=\"\\\"Rov-Control-Program\\\"\"
+    DEFINES += QGC_ORG_NAME=\"\\\"Rov-Control-Program\\\"\"
+    DEFINES += QGC_ORG_DOMAIN=\"\\\"Rov-Control-Program\\\"\"
     RESOURCES += \
         $$PWD/qgroundcontrol.qrc \
         $$PWD/qgcresources.qrc \

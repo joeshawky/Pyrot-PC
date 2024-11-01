@@ -82,7 +82,8 @@ Rectangle {
             Layout.preferredHeight: parent.height
             
             // icon.source:            "/res/QGCLogoFull"
-            icon.source:        "/qmlimages/pyrotLogo.png"
+            // icon.source:        "/qmlimages/pyrotLogo.png"
+            icon.source: "/qmlimages/talayLogo.png"
 
             logo:                   true
             onClicked:              mainWindow.showToolSelectDialog()
