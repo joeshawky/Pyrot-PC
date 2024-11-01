@@ -31,7 +31,7 @@
     "longDesc": "UDP ports to bind for video streams.",
     "type": "uint16",
     "min": 1025,
-    "default": 5600
+    "default": 5602
 },
 {
     "name": "udpPort1",
@@ -39,7 +39,7 @@
     "longDesc": "UDP ports to bind for video streams.",
     "type": "uint16",
     "min": 1025,
-    "default": 5601
+    "default": 5610
 },
 {
     "name": "udpPort2",
@@ -47,7 +47,7 @@
     "longDesc": "UDP ports to bind for video streams.",
     "type": "uint16",
     "min": 1025,
-    "default": 5602
+    "default": 5611
 },
 {
     "name":             "rtspUrl",
