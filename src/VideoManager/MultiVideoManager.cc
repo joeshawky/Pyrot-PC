@@ -15,6 +15,7 @@
 #include "QGCApplication.h"
 #include "VideoManager.h"
 #include "SettingsManager.h"
+#include "qstringliteral.h"
 
 static const char* kFileExtension[VideoReceiver::FILE_FORMAT_MAX - VideoReceiver::FILE_FORMAT_MIN] = {
     "mkv",
@@ -151,12 +152,8 @@ void MultiVideoManager::startRecording(const QString &videoFile) {
             qCDebug(VideoManagerLog) << "Does not have video";
             continue;
         }
-        QString _videoFile = savePath + "/"
-                + (videoFile.isEmpty() ? QDateTime::currentDateTime().toString("yyyy-MM-dd_hh.mm.ss") : videoFile);
-        QDir dir(QStringLiteral("%1").arg(_videoFile));
-        if (!dir.exists())
-            dir.mkpath(".");
-        _videoFile = QStringLiteral("%1/CAM%2").arg(_videoFile).arg(i) + ".";
+        QString _videoFile = videoFile;
+        _videoFile = QStringLiteral("%1_CAM%2.").arg(_videoFile).arg(i + 2);
         qCDebug(VideoManagerLog) << "Video File: " << _videoFile;
         _videoFile += ext;
         _videoReceiver[i]->startRecording(_videoFile, fileFormat);
@@ -166,6 +163,16 @@ void MultiVideoManager::startRecording(const QString &videoFile) {
 void MultiVideoManager::stopRecording() {
     for (int i = 0; i < QGC_MULTI_VIDEO_COUNT; i++) {
         _videoReceiver[i]->stopRecording();
+    }
+}
+
+void MultiVideoManager::grabImage(const QString &imageFile)
+{
+    // This function doesn't work right now. only the main camera can capture photo somehow...
+    QString fileName;
+    for (int i = 0; i < QGC_MULTI_VIDEO_COUNT; i++) {
+        fileName = QStringLiteral("%1_CAM%2.jpg").arg(imageFile).arg(i + 2);
+        _videoReceiver[i]->takeScreenshot(fileName);
     }
 }
 
