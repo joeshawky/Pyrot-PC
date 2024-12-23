@@ -272,20 +272,47 @@ Row {
 
     //Battery stat
     Item{
-        width: parent.itemWidth * 1.25
+        id: batteryStatItem
+        width: parent.itemWidth * 1.5
         height: parent.height
+        property real currentVoltage: _activeVehicle.batteries.get(0).voltage.value.toFixed(2)
+
+        property real minVoltage: 12
+        property real maxVoltage: 16.8
+
+       function batteryInRange() {
+           return batteryStatItem.currentVoltage > batteryStatItem.minVoltage && batteryStatItem.currentVoltage < batteryStatItem.maxVoltage
+       }
 
        Text{
            id: battValText
            anchors {
                left: parent.left
-               verticalCenter: parent.verticalCenter
+               top: parent.top
+           }
+           font {
+               pointSize:     ScreenTools.defaultFontPointSize
+               family:    ScreenTools.normalFontFamily
+               bold: true
            }
 
-           font.pointSize:     ScreenTools.defaultFontPointSize
-           font.family:    ScreenTools.normalFontFamily
+           color: batteryStatItem.batteryInRange() ? "white" : "red"
+           text: `${batteryStatItem.currentVoltage} V`
+       }
+       Text{
+           anchors {
+               left: parent.left
+               // verticalCenter: parent.verticalCenter
+               bottom: parent.bottom
+           }
+           font {
+               pointSize:     ScreenTools.defaultFontPointSize
+               family:    ScreenTools.normalFontFamily
+               bold: true
+           }
+
            color: "white";
-           text: `${_activeVehicle.batteries.get(0).voltage.value.toFixed(2)}v`;
+           text: `${batteryStatItem.minVoltage}-${batteryStatItem.maxVoltage} V`
        }
 
         Loader {
