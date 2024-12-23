@@ -27,7 +27,7 @@ message(Qt version $$[QT_VERSION])
 
 include(QGCCommon.pri)
 
-TARGET   = PyrotV1.4
+TARGET   = PyrotV1.5-Double-Camera
 TEMPLATE = app
 QGCROOT  = $$PWD
 
@@ -57,7 +57,7 @@ WindowsBuild {
 # Branding
 #
 
-QGC_APP_NAME        = "PyrotV1.4"
+QGC_APP_NAME        = "PyrotV1.5-Double-Camera"
 # QGC_ORG_NAME        = "QGroundControl.org"
 # QGC_ORG_DOMAIN      = "org.qgroundcontrol"
 QGC_ORG_NAME        = "PyrotName"
@@ -358,7 +358,7 @@ CustomBuild {
         RESOURCES += $$PWD/resources/InstrumentValueIcons/InstrumentValueIcons.qrc
     }
 } else {
-    DEFINES += QGC_APPLICATION_NAME=\"\\\"PyrotV1.4\\\"\"
+    DEFINES += QGC_APPLICATION_NAME=\"\\\"PyrotV1.5-Double-Camera\\\"\"
     DEFINES += QGC_ORG_NAME=\"\\\"PyrotName\\\"\"
     DEFINES += QGC_ORG_DOMAIN=\"\\\"PyrotDomain\\\"\"
     RESOURCES += \
