@@ -1,11 +1,12 @@
-# **Pyrot V1.4**
+# **Pyrot V1.5 Double Camera**
 
 # New features
-- [x] Configured multiple camera stream window to display just one stream instead of three streams.
-- [x] Changed captured videos path instead of /documents/pyrot/videos/VIDEO_NAME.mkv to /documents/pyrot/videos/VIDEO_CAPTURE_DATE/VIDEO_NAME.mkv
-
+- [x] Added a minimum and maximum voltage value representation for the battery's voltage.
   
 # Old features
+## version 1.4
+- [x] Configured multiple camera stream window to display just one stream instead of three streams.
+- [x] Changed captured videos path instead of /documents/pyrot/videos/VIDEO_NAME.mkv to /documents/pyrot/videos/VIDEO_CAPTURE_DATE/VIDEO_NAME.mkv
 ## version 1.3 
 - [x] Configured subtitle file to include time next to date, and include company name and ship name once the user fills them from application settings.
 - [x] Implemented audio input while a video is being taken, this gets enabled through application settings.
